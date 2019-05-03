@@ -1,0 +1,527 @@
+\documentclass[article, nojss]{jss}
+\usepackage{amssymb}
+%\usepackage[agsm, abbr]{harvard}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{enumerate}
+
+%\VignetteIndexEntry{Vignette for package \textbf{SimVitD}.}
+%\VignetteEngine{R.rsp::tex}
+
+\usepackage{subcaption}
+%\usepackage{listings}
+%\usepackage[toc,page]{appendix}
+\setlength{\unitlength}{1cm}
+
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{tkz-graph}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{arrows,topaths}
+%\usepackage{cite}
+
+
+%% almost as usual
+\author{Rebecca Mangan \And Jason Wyse \And Lina Zgaga}
+\title{\pkg{SimVitD}: simulation tools for powering vitamin D studies.}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Rebecca Mangan, Jason Wyse, Lina Zgaga} %% comma-separated
+\Plaintitle{Powering vitamin D studies} %% without formatting
+\Shorttitle{\pkg{SimVitD}: Powering vitamin D studies} %% a short 
+
+
+\Address{
+  Jason Wyse\\
+  Discipline of Statistics and Information Systems\\
+  School of Computer Science and Statistics\\  
+  Trinity College Dublin\\
+  College Green\\ 
+  Dublin 2, Ireland\\
+  E-mail: \email{wyseja@tcd.ie}\\
+  \
+  
+  Lina Zgaga\\
+  Discipline of Public Health and Primary Care\\
+  Institute of Public Health\\
+  School of Medicine\\  
+  Trinity College Dublin\\
+  College Green\\ 
+  Dublin 2, Ireland\\
+  E-mail: \email{zgagal@tcd.ie}\\
+ }
+ 
+\Abstract{
+\pkg{SimVitD} provides simulation based tools to compare supplementation schemes in vitamin D studies. These tools aim to account for and characterise key sources of variability and heterogeneity in vitamin D benefit. Seasonal variation in solar radiation is pronounced, which gives a natural sinoid variation in vitamin D status; consequently, the relative contribution of a vitamin D supplementation to the overall vitamin D status, and it's impact, will vary seasonally. Functionality to approximate the power of a study comparing two supplementation schemes via simulation is easily accessible.
+}
+\Keywords{Statistical power, sample size determination, heterogeneity of treatment effect}
+\Plainkeywords{Statistical power, sample size determination, heterogeneity of treatment effect}
+
+
+%
+
+\begin{document}
+
+\newcommand{\Ex}{\mathrm{E}}
+
+
+\section{Introduction}
+
+A large number of observational studies in humans suggest that vitamin D deficiency can have detrimental impacts on health~\citep{Theodoratou14}. Further, hundreds of experimental studies in animals and cell lines describe underlying (patho)physiological mechanisms associated with deficiency. Majority of an individual's vitamin D is derived from ultraviolet B (UVB) exposure~\citep{Webb88,OSullivan19}, and hence follows a strong seasonal pattern. The usefulness of vitamin D in providing immune protection against common maladies is affected by this seasonality. As well as a heterogeneous treatment effect (HTE) between individuals taking a vitamin D supplement, there may be a large intra-individual heterogeneity in the general effectiveness of supplementation depending on the season. \newline
+
+
+The package \pkg{SimVitD} presents simulation based tools to aid planning the comparison of supplementation schemes in vitamin D studies, which aim to account for a set of perceived sources of variability and heterogeneity in vitamin D benefit. As seasonal variation in solar radiation is pronounced, there will be a natural, sinoid variation in vitamin D status; consequently, the relative contribution of vitamin D supplementation to the overall vitamin D status, and it's impact, will vary seasonally: while vitamin D supplementation may contribute the majority of the vitamin D in Winter, the same dose may be relatively insignificant in the Summer. Some of the \pkg{SimVitD} schemes are shown in Figures~\ref{fig:fixed-dose} and~\ref{fig:dynamic-dose}. \newline
+
+
+Calculating the study power of a randomised control trial or the sample size required for a given power is non-trivial under such circumstances. \pkg{SimVitD} uses simulation of exposures and infections at an individual level (microsimulation), to investigate the effects of various vitamin D interventions on disease rates within a study group. Individual vitamin D status trajectories are simulated throughout the year for two or more groups, exposures and incidencesof infections are simulated based on disease risk at the time of the exposure. The power of the study (or the sample size needed to obtain a given power) can be approximated via simulation. These tools can be utilised in the planning of vitamin D studies.  \newline
+
+
+The remainder of this vignette is organised as follows. Section~\ref{sec:status} outlines our proposed models for vitamin D status profiles and supplementation schemes. Section~\ref{sec:simulation} describes simulation of a body's response to vitamin D using exposures to a common infection as example. Section~\ref{sec:powercalc} describes the scheme for approximation of the power when comparing two supplementation schemes for vitmain D. Section~\ref{sec:example} contains an example on usage of the package.
+
+\begin{figure}[!htb]
+\begin{subfigure}{0.48\textwidth}
+ \includegraphics[width=\linewidth]{placebo-fixed-schemes}
+  \caption{Placebo and fixed dose supplementation shemes.}\label{fig:fixed-dose}
+\end{subfigure}\hspace*{\fill}
+\begin{subfigure}{0.48\textwidth}
+ \includegraphics[width=\linewidth]{placebo-fixed-dynamic-schemes}
+  \caption{Dynamic dose supplementation with two threshold levels, and a fixed dose supplementaion.}\label{fig:dynamic-dose}
+\end{subfigure}\hspace*{\fill}
+\end{figure}
+
+
+\section{Model for vitamin D status} \label{sec:status}
+
+This section provides an overview of the main components of the proposed simulation based approach to estimating power and sample size determination in \pkg{SimVitD}.  
+
+Power calculations in \pkg{SimVitD} proceed by simulating many realisations of a study. Within each study, individuals' vitamin D status trajectories and potential exposures and protections from infections are simulated {\it separately}. This is akin to a microsimualation. The core steps of the simulation approach being proposed are:
+\begin{enumerate}[(i)]
+    \item simulation of an individual's vitamin D status trajectories 
+    \item simulation of an individual's exposures to infectious agents
+    \item determination of the probability of developing infection at each exposure time, dependent on an individual's vitamin D status at exposure
+    \item simulation of contracting an infection at conditional on step (iii).
+\end{enumerate}
+
+The package also contains options to approximate power values for different study designs. This can be used as an aid for planning the experimental approach, most notably determining the required sample sizes for a desired power. The power approximations are based upon many independent replications of the chosen trial design.
+
+
+
+\subsection{Vitamin D status trajectories} \label{sec:vitd_profiles}
+
+Majority of an individual's vitamin D is derived from UVB exposure~\citep{Webb88, OSullivan19}. Their vitamin D status will naturally vary throughout the year with peaks during periods with more exposure to sunlight and troughs when this is not the case~\citep{Kelly16,OSullivan17}. With this in mind, a squared sine wave curve is used as an approximation of an individual's vitamin D status profile over time. Considering a study with $n$ individuals,
+\begin{equation}
+V_i^{\mbox{\tiny pl}}(t) = H_i + A_i \sin^2(t), \quad t \geq 0  \label{eq:V_i}
+\end{equation}
+gives the profile of individual $i$ and $t$ is time. The parameters $H_i>0$ and $A_i>0$ control the overall height of the curve and the level of variability between periods with and without alot of exposure to sunlight. This guarantees strictly positive Vitamin D levels matching physical reality. In \pkg{SimVitD} an adjustment is made to account for a 1-2 month lag effect from UVB exposure to expressed vitamin D level. 
+\newline
+
+Any reasonable model of vitamin D profiles in a group of individuals would allow for random variation between individuals; we thus assume that
+\[
+A_i \sim \mbox{Gamma}\left(\kappa_A^2, \frac{\kappa_A^2}{a_0} \right) \qquad H_i \sim \mbox{Gamma}\left(\kappa_H^2, \frac{\kappa_H^2}{h_0} \right) .
+\] 
+where these are independently drawn. The parameters $a_0$ and $h_0$ give the expected heights and profile amplitudes for individuals. The parameters $\kappa_A$ and $\kappa_H$ control the deviation of individual vitamin D profiles around these expected values. More convenient parameterisations of values are discussed in Section~\ref{sec:example}. \newline
+
+In \pkg{SimVitD} these curves can be generated using the \code{vitd.curve()} function. Multiple curves can be simulated at once, to generate a group of individuals, as shown for example in Figure~\ref{fig:curves_examples}. This function also allows generation of curves for some different kinds of vitamin D supplementation schemes, where an individual takes addtional vitamin D. Two types of supplmentation schemes are avaialable beyond the curve in (\ref{eq:V_i}). The curve in (\ref{eq:V_i}) corresponds to no supplementation and is called \code{placebo} in the function through the \code{type} argument.
+
+\subsubsection*{Fixed dosing scheme}
+
+A fixed dosing scheme corresponds to an individual taking a daily vitamin D supplement of a fixed amount. In this case, the no supplement curve is modified  by shifting it up by $\delta$
+\[
+V_i^{\mbox{\tiny fix}}(t) = \delta + V_i^{\mbox{\tiny pl}}(t).
+\] 
+This assumes that there is a constant daily effect of the supplement. This scheme corresponds to \code{fixed-dose} in the \code{vitd.curve()} function and is shown in Figure~\ref{fig:fixed-dose}. The value of $\delta$ can be passed to \code{vitd.curve()}. Note however, that $\delta$ represents the change in detected vitamin D as seen in the blood, and not the dosage of the supplement. 
+
+\subsubsection*{Dynamic dosing scheme} 
+
+A dynamic dosing scheme allows an individual to be monitored regularly and their vitamin D status kept above a threshold $\tau$. That is
+\[
+V_i^{\mbox{\tiny dyn}}(t) = \max\left\{\,  \tau, V_i^{\mbox{\tiny pl}}(t)\,\right\} .
+\]
+This scheme corresponds to \code{dynamic-dose} in the \code{vitd.curve()} function. A comparison of the placebo and dosing schemes is shown in Figure~\ref{fig:dynamic-dose}.
+
+\subsubsection*{Crossover schemes from placebo to fixed or dynamic dosing}
+
+For a crossover study, an individual switches from placebo to either one of a fixed dosing or dynamic dosing scheme. A crossover time $\xi$ is given, and then
+\[
+V_i^{\mbox{\tiny cross}}(t) = V_i^{\mbox{\tiny pl}}(t)\, \mathrm{I}(t \leq \xi) + V_i^{\mbox{\tiny treat}}(t)\, \mathrm{I}(t > \xi),
+\]
+with $\mathrm{I}(\cdot)$ the indicator function and ``treat'' representing the treatment scheme used i.e. either fixed dosing or dynamic dosing. 
+
+\subsubsection{Fluctuations and seasonal schedule}
+
+The default of the package is to work on the assumption of a northern hemisphere seasonal schedule with Summer months being June to August. Cyclic vitamin D profiles follow the assumed yearly periodic curve with troughs in March and peaks in September~\citep{Kelly16,OSullivan17}. The  September peak is an adjustment for the 1-2 month time lag it takes absorbed UVB to express as serum measurable vitamin D. 
+
+
+\begin{figure}[h!] 
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{Placebo_10_participants.pdf}
+\caption{Vitamin D profiles from placebo group} \label{fig:a}
+\end{subfigure}\hspace*{\fill}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{Over50_20_participants.pdf}
+\caption{Vitamin D profiles from treatment group with a threshold level of 50}
+\end{subfigure}
+\caption{Examples of vitamin D profiles simulated using the \texttt{vid.curve()} function. (a) Typical curves displaying random variation for a group of participant's without any supplementation (placebo). (b) Curves for a group where vitamin D is monitored and supplemented so as to be consistently be above 50 (units).  } \label{fig:curves_examples}
+\end{figure}
+
+
+\section{Response to vitamin D} \label{sec:simulation}
+
+The \pkg{SimVitD} package allows one to investigate, via simulation, potential benefits of vitamin D supplementation. It presents a toolbox, to investigate potential outcomes of studies for particular states of nature. From this perspective the package is designed to examine the immune boosting properties of having sufficient vitamin D levels. We take an unnamed infection which vitamin D protects against. The assumption is that there is less likelihood of getting the infection if one has high vitamin D levels when susceptible and exposed to it. 
+
+\subsubsection{Exposures to infection}
+
+An individual's exposures to infection over the period of a prospective vitamin D study are simulated from a Possion process. In the case of seasonally concentrated infections (e.g. flu), a non-homegeneous Poisson process (NHPP) with rate function $\lambda(t), t\geq 0$ is used. Simulations from an NHPP in \pkg{SimVitD} are done through the R package \pkg{poisson}~\citep{Brock15}. The function $\lambda(t)$ is defined by rescaling an overall rate $\lambda_0$ which gives the rate of exposures when most intense
+\[
+\lambda(t) = \lambda_0 \,\upsilon(t), \qquad 0 \leq \upsilon(t) \leq 1, \qquad t\geq 0.
+\]
+The function $\upsilon(t)$ may be passed by the user. A convenience function \code{intensity.function()} gives a step function for simple Summer/Winter rates, as shown in Figure~\ref{fig:intensity_examples}.
+
+\subsubsection{Likelihood of infection}
+
+The likelihood an individual gets infection after an exposure depends on their vitamin D status at exposure. This is modulated by a baseline (healthy) prevalence $p_0$ and a relative risk curve.  The probability $p_0$ gives the probability of a vitamin D replete individual contracting an infection after exposure. The relative risk curve is a member of generalised logistic family
+\[
+g(x) = \ell + \frac{u - \ell}{1 + \mathrm{e}^{a + b \,x}},
+\]
+where $x$ is the vitamin D status. The parameters $\ell,u$ give the lowest and highest relative risk values. The value of $u$ states how much more likely one is to get infection when completely depleted in vitamin D compared with when one is fully replete. The values of $a$ and $b$ are determined by providing points of inflection of the relative risk curve. These points default to 10 and 70 nmol/l in the package; these are values where we see the greatest change in immunity due to vitamin D supplementation. See Figures~\ref{fig:rrcurve1} and~\ref{fig:rrcurve2} for examples. 
+
+\subsubsection{Summary of simulation steps}
+
+We now summarise the simulation of exposures and infections. Consider individual $i$ and let $T_{1},\dots,T_{N}$ denote the times at which they are exposed. Exposure times only within the frame of the study are used: $T_{\mbox{\tiny start}} < T_k \leq T_{\mbox{\tiny end}}$, $k=1,\dots, N$.
+\begin{eqnarray*}
+T_1,\dots,T_N &\sim & \mathrm{NHPP}(\lambda(t)) \qquad \mbox{ simulate the exposure time}\\
+L_k & = & V_i^{\mbox{\tiny pl}}(T_k)\qquad \qquad \mbox{\,\, find the individual's vitamin D status $k=1,\dots,N$}\\
+P_k & = & p_0 \, g( L_k )\qquad \qquad\mbox{ get the probability of infection after exposure $k=1,\dots,N$}\\
+I_k & \sim & \mbox{Bernoulli}(P_k) \qquad \mbox{simulate developing infection at exposures $k=1,\dots,N$}.
+\end{eqnarray*}
+In the case of infections ($I_k=1$), \pkg{SimVitD} includes an option to impose a ``holding time''; an exponentially distributed amount of time where the infected individual is not susceptible to a new infection.  
+
+
+\begin{figure}[h!] 
+\begin{subfigure}{0.48\textwidth}
+\includegraphics[width=\linewidth]{intensity_half2.pdf}
+\caption{Intensity function for flu season with summer rate = 0 and winter rate = 1 } \label{fig:a}
+\end{subfigure}\hspace*{\fill}
+\begin{subfigure}{0.48\textwidth}
+\includegraphics[width=\linewidth]{intensity_half.pdf}
+\caption{Intensity function for non flu season with summer rate = 0.2 and winter rate = 0.8}
+\end{subfigure}
+\caption{Examples of intensity functions simulated using  \code{intensity.function()}  } \label{fig:intensity_examples}
+\end{figure}
+
+
+\section{Study power}\label{sec:powercalc}
+
+\pkg{SimVitD} has functionality to approximate the power of study comparing two supplementation schemes for three kinds of tests. It is perceivable that the three tests used might be the kind used on data arising from such a study. Denote the supplementation schemes being compared by $A$ (placebo) and $B$ (treatment). Scheme $B$ is hypothesised to boost the immune system and reduce infection incidence. Assume an equal number of participants $n$ assigned to both schemes.
+
+\subsubsection{Types of tests}
+
+Define 
+\begin{eqnarray*}
+p_A &=& \Pr\{ \mbox{individual gets $\geq 1$ infection receiving scheme $A$} \}\\
+m_A &=& \mbox{ median number of infections for individual receiving scheme $A$}
+\end{eqnarray*}
+and define $p_B$ and $m_B$ similarly. \pkg{SimVitD} can approximate power for testing the sets of hypotheses
+\begin{eqnarray}
+H_0: p_A \leq p_B & \qquad & H_A: p_A > p_B \label{eq:proptest}\\
+H_0: m_A \leq m_B  & \qquad  & H_A: m_A > m_B.\label{eq:counttest}
+\end{eqnarray}
+A test of (\ref{eq:proptest}) is carried out using a proportions test (\code{prop.test} in package \pkg{stats}), and (\ref{eq:counttest}) is tested using a Wilcoxon rank sum test (\code{wilcox.test} in package \pkg{stats}) for comparing two populations. There is also a crossover study design considered where individuals switch supplementation at a specified stage in the study. The median difference $\Delta$, of the number of infections on scheme $A$ less scheme $B$ in the crossover is tested,
+\begin{equation}
+H_0:  \Delta \leq 0  \qquad  H_A: \Delta > 0 \label{eq:crosstest}
+\end{equation}
+using paired samples, through a Binomial test (\code{binom.test} in package \pkg{stats}). 
+
+\subsubsection{Approximating the power}
+
+The power of a test is 
+\[
+\mbox{Power} = \Pr\{ \mbox{reject }H_0 \,|\, H_A\mbox{ is true}\}.
+\]
+The rejection decision depends on a significance level $\alpha$, giving the probability of a Type I error,
+\[
+\alpha = \Pr\{ \mbox{reject }H_0 \,|\, H_0\mbox{ is true}\}.
+\]
+
+
+\pkg{SimVitD} approximates the power for $n$ participants in each of schemes $A$ and $B$ (or $n$ total in a crossover design) by simulating a large number, $N$, of studies, and carrying out the test in each of these. The scheme is outlined in Figure~\ref{fig:flowchart}. \newline
+
+\begin{figure}[!h]
+\begin{center}
+\hspace*{-1cm}\fbox{
+\begin{tikzpicture}
+  \tikzstyle{sta} = [rectangle, rounded corners,draw,minimum width=20pt]
+	
+\node[text width = 90pt] (propw) at (3,5.2) {\bf{Carry out a test of $H_0$ for each study}};
+
+\node[text width = 90pt] (prop) at (-1,5.2) {\bf{Simulate many instances of the study}};
+	
+	\node[text width = 120pt] (propr) at (7.5,5.2) {\bf{Combine all decisions to approximate power}};
+	
+	
+	\node[text width = 120pt] (propq) at (-6,5.2) {\bf{Specify settings for simulation of indivuals in schemes $A$ and $B$} };	
+
+	\node[sta,text width = 120pt] (orig1) at (-6,1) {Give $n$ and settings for simulation
+	of vitamin D profiles under schemes $A$ and $B$, exposures rate function $\lambda(t)$, $p_0$, $g(x)$, hypotheses to test $H_0,H_A$ and $\alpha$.  }; 
+	
+\node[sta,text width = 110pt] (origend) at (7,1) { Approximate the power via \[\widehat{\mbox{Power}} = \frac{\mbox{\# $H_0$ rejected}}{N}\] }; 	
+	
+	
+	%\node (orig1) at (-5,1) {};
+	\node[sta] (mv1) at (-1.5,3) {Study 1}; 
+  	\node[sta] (mv2) at (-1.5,1.5) {Study 2}; 
+  	\node[sta] (mv3) at (-1.5,-1) {Study $N$}; 
+  	
+  	\node (mvd) at (-1,0.5) {$\vdots$};
+  	\node (mvd) at (-1,0) {$\vdots$};
+  	
+  	\node[sta] (mvv1) at (2,3) {$H_0$ decision 1}; 
+  	\node[sta] (mvv2) at (2,1.5) {$H_0$ decision 2}; 
+  	\node[sta] (mvv3) at (2,-1) {$H_0$ decision $N$}; 
+  	
+  	\node (mvd) at (2.5,0.5) {$\vdots$};
+  	\node (mvd) at (2.5,0) {$\vdots$};
+  	
+  	%\draw[-] (orig) edge (orig1);
+  	\draw[->]   (orig1) edge (mv1);
+  	\draw[->]  	(orig1) edge (mv2);
+  	\draw[->] 	(orig1) edge (mv3);
+  	
+  	%\draw[-] (orig) edge (orig1);
+  	\draw[->]   (mv1) edge (mvv1);
+  	\draw[->]  	(mv2) edge (mvv2);
+  	\draw[->] 	(mv3) edge (mvv3);
+  	
+  	\draw[->]   (mvv1) edge (origend);
+  	\draw[->]  	(mvv2) edge (origend);
+  	\draw[->] 	(mvv3) edge (origend);
+  	
+
+\end{tikzpicture}
+}
+\end{center}
+\caption{Flowchart showing the simulation process for estimating the power of a study.} \label{fig:flowchart}
+\end{figure}
+
+Each of the $N$ instances of the study are simulated under $H_A$ being true. For each instance, the test of hypothesis for $H_0$ is applied to the study's data. The decision (reject or not) is recorded. A sample estimate of the power is then given by
+\[
+\widehat{\mbox{Power}} = \frac{\#\mbox{ $H_0$ rejected }}{N},
+\]
+the proportion of times $H_0$ was rejected when $H_A$ was the actual state of nature. By the law of large numbers, we have
+\[
+\widehat{\mbox{Power}} \rightarrow \mbox{Power} 
+\]
+as $N\rightarrow \infty$ and we also have
+\[
+\mbox{error}\left\{ \widehat{\mbox{Power}}\right\} \propto \frac{1}{\sqrt{N}}.
+\]
+Functionality for approximation of the power in \pkg{SimVitD} is through the \code{power.calc()} function. Investigation of the error in approximation of the power is also possible through the \code{mc.error} argument. 
+
+\section{Using the package} \label{sec:example}
+
+This section aims to outline an example use case for the package. In this example one group is given a dynamic dosing scheme, keeping vitamin D levels above 50 nmol/l. This is compared to a group given no supplementation (i.e. placebo). The primary endpoint is the number of respiratory tract infections seen in the two groups. The study takes place in Ireland where mean maximum vitamin D levels are approximately 80 nmol/l and mean minimum levels are approximately 10 nmol/l. The researcher aims to enrol a diverse cohort of participants, who will be randomly assigned to one of the two groups. Thus, a large scatter around these mean levels may be expected. The study will last one year, indicated by the arguments \code{start} and \code{end}. \newline
+
+Vitamin D status trajectories for the supplemetation schemes described in Section~\ref{sec:vitd_profiles} are generated using the \code{vitd.curve()} function. The values of $\kappa_A, a_0, \kappa_H$ and $h_0$ giving the amplitudes and height of simulated vitamin D status trajectories are determined through the prior expectations about the groups under study. The value of $a_0$ is determined from the difference of the arguments \code{Min.Height} and \code{Max.Height} in the package, while the value of $h_0$ is identical to the value passed for \code{Min.Height}. The values $a_0$ and $h_0$ give the expected amplitude and mean level of the Vitamin D profile curve. The values of $\kappa_A$ and $\kappa_H$ quantify the spread about the mean level in multiples of the mean. Regarding the inputs into our package, the value of $\kappa_A$, for example, is derived from the \code{Spread.Max} argument via $100/\mbox{\texttt{Spread.Max}}$; this translates as larger values of \code{Spread.Max} corresponding to more variance in the generated Vitamin D profiles. The value of $\kappa_H$ is derived analogously using the \code{Spread.Min} argument.\newline
+
+
+\subsubsection{Simulating and plotting vitamin D status profiles}
+
+The two groups are generated and plotted using the below code.
+
+\begin{CodeInput}
+R> control <- vitd.curve( 20, type = "placebo", start = 0, end = 1, Min.Height = 10, 
+				Max.Height = 80, Spread.Min = 10, Spread.Max = 10 )
+R> plot(control)
+            
+R> treatment <- vitd.curve( 20, type = "dynamic-dose", start = 0, end = 1,
+				Min.Height = 10, Max.Height = 80, Flat.Height = 50, 
+				Spread.Min = 10, Spread.Max = 10, Spread.FH = 10 )
+R> plot(treatment)
+\end{CodeInput}
+
+\begin{figure}[h!] % "[t!]" placement specifier just for this example
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{profiles-exposures-placebo}
+\caption{Placebo group} \label{fig:a}
+\end{subfigure}\hspace*{\fill}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{profiles-exposures-dynamic}
+\caption{Dynamic dosing group} \label{fig:b}
+\end{subfigure}
+\caption{Vitamin D profiles for the placebo and dynamic dosing groups with exposures in red and infections in blue}
+
+\end{figure}
+
+\subsubsection{Exposures to infection and resulting cases}
+
+Next exposure times to respiratory tract infections are simulated. The same intensity function is used for both groups, with a mean of one exposure per week and with no exposures occurring outside of flu season. 
+
+\begin{CodeInput}
+R> intensfun <- intensity.function( summer.rate = 0, winter.rate = 1, flu = TRUE )
+
+R> control_expos <- exposure.levels( control, rate = 1, intensfun, end = 1 )
+
+R> treatment_expos <- exposure.levels( treatment, rate = 1, intensfun, end = 1 )
+
+R> control_inf <- infection.count( control_expos, baseline = 0.03, 
+					RR = 3, holding.time = 2 )
+            
+R> treatment_inf <- infection.count( treatment_expos, baseline = 0.03, 
+					RR = 3, holding.time = 2 )
+\end{CodeInput}
+
+The exposures and infections may be plotted over the vitamin D status profiles.
+
+\begin{CodeInput}
+R> plot(control)
+R> plot(control_expos)
+R> infection.count.plot(control_expos, control_inf)
+R> plot(treatment)
+R> plot(treatment_expos)
+R> infection.count.plot(treatment_expos, treatment_inf)
+\end{CodeInput}
+
+\subsubsection{Exploring seasonal variation in risk}
+
+\code{rr.curve.plot()} visualises where exposures occur on the relative risk curve. Figures~\ref{fig:rrcurve1} and~\ref{fig:rrcurve2} show the output of
+
+\begin{CodeInput}
+R> rr.curve.plot(control_expos, control_inf )
+R> rr.curve.plot(treatment_expos, treatment_inf )
+\end{CodeInput}
+elucidating the discrepancy between the placebo and dynamic dosing schemes by indicating what the risk level is for infection in each group. \newline
+
+\begin{figure} % "[t!]" placement specifier just for this example
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{rr-curve-placebo}
+\caption{Relative risk at exposures with infections indicated for placebo group.} \label{fig:rrcurve1}
+\end{subfigure}\hspace*{\fill}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{rr-curve-treatment}
+\caption{Relative risk at exposures with infections indicated for dynamic dosing group.} \label{fig:rrcurve2}
+\end{subfigure}
+\caption{Relative risk curve with exposures and infections overlain. Output from \code{rr.curve.plot()}.}
+\end{figure}
+
+
+
+The \code{rr.profile.plot()} function gives a visualisation tool to explore the seasonal variation in risk for an individual. It indicates where exposures occurred in the vitamin D status profile and the corresponding relative risk side-by-side. The exposures resulting in infection are also indicated. An example is shown in Figures~\ref{fig:rr1} and~\ref{fig:rr2} which are obtained from
+
+\begin{CodeInput}
+R> rr.profile.plot( control, control_expos, control_inf )
+R> rr.profile.plot( treatment, treatment_expos, treatment_inf )
+\end{CodeInput}
+
+\begin{figure} % "[t!]" placement specifier just for this example
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{rr-profile-placebo}
+\caption{Single participant from placebo group} \label{fig:rr1}
+\end{subfigure}\hspace*{\fill}
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\linewidth]{rr-profile-dynamic}
+\caption{Single participant from dynamic dose group} \label{fig:rr2}
+\end{subfigure}
+\caption{Profiles and relative risk for single participants with exposures in red and infections in blue. Output from \code{rr.profile.plot()}.}
+\end{figure}
+
+\subsubsection{Approximating power of detecting difference in treatment}
+
+The summaries from the \code{infection.count} objects show a difference in the mean between the placebo and dynamic dosing groups. The mean of the dynamically dosed group being lower than the mean of the control group. The \code{power.calc} function is used to determine the sample size needed to obtain at least 80\% power. 
+
+\begin{CodeInput}
+R> pow <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
+        test.type = "count", sig.level = 0.05, 
+        vitdcurves.placebo = control, vitdcurves.treatment  = treatment, 
+        baseline = 0.03, RR = c(2,3,4), rate = 1, intensity.func = intensfun, 				holding.time = 2 )
+        
+R> plot( pow, x.legend = 20, y.legend = 1,
+        main.legend = "Relative Risk", legend.size = 0.8 )
+        
+R> abline( h = 0.8, lty = 2 )
+\end{CodeInput}
+
+A large value of \code{num.sims} should be used. A value of at least 500 is recommended. 
+
+
+The power calculation shows that in order to get a power of 80\% the study would need to enrol at least 60 participants in each group, when a relative risk of 3 is assumed.
+
+\begin{figure}
+\centering
+    \includegraphics[width=0.7\textwidth]{pow.pdf}
+    \caption{Output from \code{plot(pow)} showing esitmate of the power at each relative risk  level and specified value of $n$.}
+    \label{fig:2}
+\end{figure}
+
+\subsubsection{Exploring the Monte Carlo error in power approximation}
+
+Monte Carlo error in the power approximation may be explored by using the \code{mc.error} argument to \code{pow.calc()}. 
+
+\begin{CodeInput}
+
+R> pow_mc <- power.calc( num.participants = c(20,40,60), num.sims = 500,                 
+	test.type = "count", sig.level = 0.05, 
+	vitdcurves.placebo = control, vitdcurves.treatment = treatment, 
+	baseline = 0.03, RR = c(2,3,4), rate = 1, 
+	intensity.func = intensfun, holding.time = 2, mc.error=10 )
+	
+R> plot(pow_mc)
+\end{CodeInput}
+
+\begin{figure}[h!]
+\centering
+    \includegraphics[width=0.7\textwidth]{mc_pow.pdf}
+    \caption{Output from \code{plot(pow$\_$mc)} showing the result of the estimation of power over ten runs at each relative risk level and value of $n$.}
+\end{figure}
+
+\subsubsection{Crossover design}
+
+For the crossover design there are two options. Participants swap from placebo to either one of fixed or dynamic dosing. In the code below, a two year trial is considered, with a crossover from placebo to dynamic dosing after the first year.  
+
+\begin{CodeInput}
+R> crossover <- vitd.curve( 20, type = "cross-placebo-dynamic-dose", 
+              		start = 0, end = 2, cross = 1, 
+             	 	Max.Height = 80, Min.Height = 10, Flat.Height = 50,
+              		Spread.Min = 10, Spread.Max = 10, Spread.FH = 20 )
+
+R> plot(crossover)
+\end{CodeInput}
+The plot output is shown in Figure~\ref{fig:crossover} where the cross from placebo to supplementation is clear. 
+
+\begin{figure}[h!]
+\centering
+    \includegraphics[width=0.7\textwidth]{placebo-dynamic-cross}
+    \caption{Status curves for two year crossover from placebo to dynamic dosing.} \label{fig:crossover}
+\end{figure}
+
+Approximation of the power can also be carried out using \code{pow.calc()}. In this case, only the \code{vitdcurves.treatment} argument will be passed. Figure~\ref{fig:crossover-pow} shows the approximate power. 
+
+\begin{CodeInput}
+R> pow_cross <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
+                   test.type = "crossover", sig.level = 0.05, 
+                   vitdcurves.treatment  = crossover, 
+                   baseline = 0.03, RR = c(2,3,4), rate = 1, 
+                   intensity.func = intensfun, holding.time = 2, mc.error=10 )
+
+R> plot(pow_cross)
+\end{CodeInput}
+
+\begin{figure}[h!]
+\centering
+    \includegraphics[width=0.7\textwidth]{cross-placebo-dynamic-dose}
+    \caption{Power curves for two year crossover from placebo to dynamic dosing.} \label{fig:crossover-pow}
+\end{figure}
+
+
+\newpage
+
+
+\bibliography{SimVitD}
+
+\end{document}

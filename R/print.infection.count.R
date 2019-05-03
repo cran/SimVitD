@@ -1,0 +1,16 @@
+print.infection.count <- function( x, ... ){
+  cat( "\n $baseline \n" )
+  print( x$baseline )
+  cat( "\n $RR \n" )
+  print( x$RR )
+  cat( "\n $probs \n" )
+  print( round( x$probs, 4 ) )
+  cat( "\n $relativerisk \n" )
+  print( round( x$relativerisk, 4 ) )
+  cat( "\n $infection \n" )
+  print( x$infection )
+  cat( "\n $count \n" )
+  print( x$count )
+  cat( "\n $mean \n" )
+  print( x$mean )
+}
