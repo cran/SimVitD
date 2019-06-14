@@ -1,7 +1,7 @@
 power.calc <- function( num.participants, num.sims, test.type, sig.level = 0.05,
                         vitdcurves.placebo = NULL, vitdcurves.treatment = NULL,
                         baseline = 0.03, RR = 3,
-                        rate = 1, intensity.func = intensity.extreme, holding.time = 2, mc.error = 1 ){
+                        rate = 1, intensity.func = intensity.extreme, holding.time = 2, mc.error = 1, lohi.vit = c(10,70) ){
   
   placebo.group <- vitdcurves.placebo
   treatment.group <- vitdcurves.treatment
@@ -60,7 +60,7 @@ power.calc <- function( num.participants, num.sims, test.type, sig.level = 0.05,
                                      placebo.group$spread.fh, placebo.group$supp.dose )
               placebo.levels <- exposure.levels( placebo, rate,
                                                  intensity.func = intensity.func, end )
-              placebo.disease <- infection.count( placebo.levels, baseline, rel.risk, holding.time )
+              placebo.disease <- infection.count( placebo.levels, baseline, rel.risk, holding.time, lohi.vit=lohi.vit )
       
       
               treat <- vitd.curve( N, treatment.group$type, start, end, cross, treatment.group$min.height, treatment.group$max.height,
@@ -68,7 +68,7 @@ power.calc <- function( num.participants, num.sims, test.type, sig.level = 0.05,
                                    treatment.group$spread.fh, treatment.group$supp.dose )
               treat.levels <- exposure.levels( treat, rate,
                                                intensity.func = intensity.func, end )
-              treat.disease <- infection.count( treat.levels, baseline, rel.risk, holding.time )
+              treat.disease <- infection.count( treat.levels, baseline, rel.risk, holding.time, lohi.vit=lohi.vit )
             
             }else{
               
@@ -84,7 +84,7 @@ power.calc <- function( num.participants, num.sims, test.type, sig.level = 0.05,
                                    treatment.group$spread.fh, treatment.group$supp.dose )
               treat.levels <- exposure.levels( treat, rate,
                                                intensity.func = intensity.func, end )
-              treat.disease <- infection.count( treat.levels, baseline, rel.risk, holding.time )
+              treat.disease <- infection.count( treat.levels, baseline, rel.risk, holding.time, lohi.vit=lohi.vit )
               
               placebo.disease <- NULL
             }

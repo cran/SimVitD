@@ -1,4 +1,4 @@
-12bff9ab46c5c8e3a0b2e182732e4cb6 *DESCRIPTION
+722f342e197d59e0a1591e9bd3d5dd69 *DESCRIPTION
 6c76d5b440677feed7ea80317b06db02 *NAMESPACE
 a4b8224b814a2eb1bd2c6f8fb36cef3a *R/exposure.levels.R
 134160f8582b0e724fd93b4a95aba358 *R/infection.count.R
@@ -7,7 +7,7 @@ ed1326c59243f335c033a9902482e2b9 *R/infection.count.plot.R
 5577f07b3326fca512926a4e0373ec93 *R/plot.exposure.levels.R
 1200214b56cb8c137a39982e2c955a8b *R/plot.power.calc.R
 d3f627a72f04c9085bd9ce0085a87b43 *R/plot.vitd.curve.R
-3673c05ebf5de191d989bf3864b00675 *R/power.calc.R
+27dd7aebb19b8c2d472d7a523dd238c3 *R/power.calc.R
 e0d35855b60fd8056044ea2caef7a105 *R/print.exposure.levels.R
 7f0303a6fe3ad8d485922760e637a021 *R/print.infection.count.R
 259e62559ef9cbbbd17ca1eda3e419aa *R/print.power.calc.R
@@ -22,10 +22,11 @@ f9acca7d7579527bb3bf6eb5189a775e *R/summary.infection.count.R
 c6754c32a23008900a20186782c0c18d *R/summary.vitd.curve.R
 535b98d1a2a7cca6eade24966bf5b4a2 *R/vitamin.profiles.R
 c53effc7549a70bd4b0797c9c090f319 *R/vitd.curve.R
-83295fedc30dac2d26001c021eab7e97 *build/vignette.rds
-74899192452987a5237dfde02ba4f4f3 *inst/doc/SimVitD.ltx
-1ee780ed7b697914588dd5935dc65e48 *inst/doc/SimVitD.pdf
-d58ab5c9351a3bce67e19e2fcba5a230 *man/SimVitD-package.Rd
+91f1549c93fc6e746c83fb9637e413f3 *build/vignette.rds
+c70768b1c6d1e69c2a7929add05393ea *inst/doc/SimVitD.R
+874e8479eca237910a95f9046b091c74 *inst/doc/SimVitD.Rnw
+7886af85ddca2ab213c67c805e343cb0 *inst/doc/SimVitD.pdf
+3866afc4bfc82fc5642fc2408b108989 *man/SimVitD-package.Rd
 ef35011b2ec10beaae728dfd437417c8 *man/exposure.levels.Rd
 7aee6734eb52e90cd355280e87d22ea0 *man/infection.count.Rd
 87bfb98723bc3a2a24f7ea1fd5eb00d7 *man/infection.count.plot.Rd
@@ -33,7 +34,7 @@ db14ad570a49417dfd6056cade4c4700 *man/intensity.function.Rd
 342d71a4e178760deab328b3917da570 *man/plot.exposure.levels.Rd
 9e7a29574e4da8aecb5653ad769ef68d *man/plot.power.calc.Rd
 bd5bf91e04e9403ba54c675701c1009c *man/plot.vitd.curve.Rd
-281a11ba9f4eacc5f222e76cea0cd73e *man/power.calc.Rd
+f986beebab00e88495854c0d1e78bbc8 *man/power.calc.Rd
 b0c511d33f17ba4be1de4883c18bfed8 *man/print.exposure.levels.Rd
 dac305d42cf31fe482e76b59b14292c6 *man/print.infection.count.Rd
 98ac648c12ce3d9202a6923393f9a5ca *man/print.power.calc.Rd
@@ -49,8 +50,8 @@ a54b5d5fb72f97a4f389bbe86beab395 *man/summary.power.calc.Rd
 f9d1a4a513701b871eefda076ae45d9f *vignettes/Chicago.bst
 324b58d12d2f3fc89c6721e1250407f6 *vignettes/Over50_20_participants.pdf
 30b5078d6d7441ee524a65b2e46a9ded *vignettes/Placebo_10_participants.pdf
+874e8479eca237910a95f9046b091c74 *vignettes/SimVitD.Rnw
 4c928c21e780bd722b67d3ceb59ccc13 *vignettes/SimVitD.bib
-74899192452987a5237dfde02ba4f4f3 *vignettes/SimVitD.ltx
 5d9b1e581a89be55002a0448a07e6f9e *vignettes/cross-placebo-dynamic-dose.pdf
 7773fe43db4d752a794219390c4654d1 *vignettes/intensity_half.pdf
 ee542546cfd5374d269e01c1f363ee16 *vignettes/intensity_half2.pdf

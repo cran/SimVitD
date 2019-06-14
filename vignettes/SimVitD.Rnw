@@ -10,8 +10,7 @@
 \usepackage{enumerate}
 \usepackage{enumerate}
 
-%\VignetteIndexEntry{Vignette for package \textbf{SimVitD}.}
-%\VignetteEngine{R.rsp::tex}
+%\VignetteIndexEntry{Vignette for package SimVitD.}
 
 \usepackage{subcaption}
 %\usepackage{listings}
@@ -39,7 +38,7 @@
 
 
 \Address{
-  Jason Wyse\\
+  Jason Wyse \& Rebecca Mangan (formerly)\\
   Discipline of Statistics and Information Systems\\
   School of Computer Science and Statistics\\  
   Trinity College Dublin\\
@@ -69,7 +68,13 @@
 
 \begin{document}
 
+\SweaveOpts{concordance=TRUE}
+
 \newcommand{\Ex}{\mathrm{E}}
+
+<<echo=FALSE>>=
+options(prompt = "R> ", continue="...")
+@
 
 
 \section{Introduction}
@@ -335,16 +340,16 @@ Vitamin D status trajectories for the supplemetation schemes described in Sectio
 
 The two groups are generated and plotted using the below code.
 
-\begin{CodeInput}
-R> control <- vitd.curve( 20, type = "placebo", start = 0, end = 1, Min.Height = 10, 
+<<eval=FALSE>>=
+control <- vitd.curve( 20, type = "placebo", start = 0, end = 1, Min.Height = 10, 
 				Max.Height = 80, Spread.Min = 10, Spread.Max = 10 )
-R> plot(control)
+plot(control)
             
-R> treatment <- vitd.curve( 20, type = "dynamic-dose", start = 0, end = 1,
+treatment <- vitd.curve( 20, type = "dynamic-dose", start = 0, end = 1,
 				Min.Height = 10, Max.Height = 80, Flat.Height = 50, 
 				Spread.Min = 10, Spread.Max = 10, Spread.FH = 10 )
-R> plot(treatment)
-\end{CodeInput}
+plot(treatment)
+@
 
 \begin{figure}[h!] % "[t!]" placement specifier just for this example
 \begin{subfigure}{0.5\textwidth}
@@ -363,39 +368,39 @@ R> plot(treatment)
 
 Next exposure times to respiratory tract infections are simulated. The same intensity function is used for both groups, with a mean of one exposure per week and with no exposures occurring outside of flu season. 
 
-\begin{CodeInput}
-R> intensfun <- intensity.function( summer.rate = 0, winter.rate = 1, flu = TRUE )
+<<eval=FALSE>>=
+intensfun <- intensity.function( summer.rate = 0, winter.rate = 1, flu = TRUE )
 
-R> control_expos <- exposure.levels( control, rate = 1, intensfun, end = 1 )
+control_expos <- exposure.levels( control, rate = 1, intensfun, end = 1 )
 
-R> treatment_expos <- exposure.levels( treatment, rate = 1, intensfun, end = 1 )
+treatment_expos <- exposure.levels( treatment, rate = 1, intensfun, end = 1 )
 
-R> control_inf <- infection.count( control_expos, baseline = 0.03, 
+control_inf <- infection.count( control_expos, baseline = 0.03, 
 					RR = 3, holding.time = 2 )
             
-R> treatment_inf <- infection.count( treatment_expos, baseline = 0.03, 
+treatment_inf <- infection.count( treatment_expos, baseline = 0.03, 
 					RR = 3, holding.time = 2 )
-\end{CodeInput}
+@
 
 The exposures and infections may be plotted over the vitamin D status profiles.
 
-\begin{CodeInput}
-R> plot(control)
-R> plot(control_expos)
-R> infection.count.plot(control_expos, control_inf)
-R> plot(treatment)
-R> plot(treatment_expos)
-R> infection.count.plot(treatment_expos, treatment_inf)
-\end{CodeInput}
+<<eval=FALSE>>=
+plot(control)
+plot(control_expos)
+infection.count.plot(control_expos, control_inf)
+plot(treatment)
+plot(treatment_expos)
+infection.count.plot(treatment_expos, treatment_inf)
+@
 
 \subsubsection{Exploring seasonal variation in risk}
 
 \code{rr.curve.plot()} visualises where exposures occur on the relative risk curve. Figures~\ref{fig:rrcurve1} and~\ref{fig:rrcurve2} show the output of
 
-\begin{CodeInput}
-R> rr.curve.plot(control_expos, control_inf )
-R> rr.curve.plot(treatment_expos, treatment_inf )
-\end{CodeInput}
+<<eval=FALSE>>=
+rr.curve.plot(control_expos, control_inf )
+rr.curve.plot(treatment_expos, treatment_inf )
+@
 elucidating the discrepancy between the placebo and dynamic dosing schemes by indicating what the risk level is for infection in each group. \newline
 
 \begin{figure} % "[t!]" placement specifier just for this example
@@ -414,10 +419,10 @@ elucidating the discrepancy between the placebo and dynamic dosing schemes by in
 
 The \code{rr.profile.plot()} function gives a visualisation tool to explore the seasonal variation in risk for an individual. It indicates where exposures occurred in the vitamin D status profile and the corresponding relative risk side-by-side. The exposures resulting in infection are also indicated. An example is shown in Figures~\ref{fig:rr1} and~\ref{fig:rr2} which are obtained from
 
-\begin{CodeInput}
-R> rr.profile.plot( control, control_expos, control_inf )
-R> rr.profile.plot( treatment, treatment_expos, treatment_inf )
-\end{CodeInput}
+<<eval=FALSE>>=
+rr.profile.plot( control, control_expos, control_inf )
+rr.profile.plot( treatment, treatment_expos, treatment_inf )
+@
 
 \begin{figure} % "[t!]" placement specifier just for this example
 \begin{subfigure}{0.5\textwidth}
@@ -435,17 +440,17 @@ R> rr.profile.plot( treatment, treatment_expos, treatment_inf )
 
 The summaries from the \code{infection.count} objects show a difference in the mean between the placebo and dynamic dosing groups. The mean of the dynamically dosed group being lower than the mean of the control group. The \code{power.calc} function is used to determine the sample size needed to obtain at least 80\% power. 
 
-\begin{CodeInput}
-R> pow <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
+<<eval=FALSE>>=
+pow <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
         test.type = "count", sig.level = 0.05, 
         vitdcurves.placebo = control, vitdcurves.treatment  = treatment, 
-        baseline = 0.03, RR = c(2,3,4), rate = 1, intensity.func = intensfun, 				holding.time = 2 )
+        baseline = 0.03, RR = c(2,3,4), rate = 1, intensity.func = intensfun, holding.time = 2 )
         
-R> plot( pow, x.legend = 20, y.legend = 1,
+plot( pow, x.legend = 20, y.legend = 1,
         main.legend = "Relative Risk", legend.size = 0.8 )
         
-R> abline( h = 0.8, lty = 2 )
-\end{CodeInput}
+abline( h = 0.8, lty = 2 )
+@
 
 A large value of \code{num.sims} should be used. A value of at least 500 is recommended. 
 
@@ -463,16 +468,15 @@ The power calculation shows that in order to get a power of 80\% the study would
 
 Monte Carlo error in the power approximation may be explored by using the \code{mc.error} argument to \code{pow.calc()}. 
 
-\begin{CodeInput}
-
-R> pow_mc <- power.calc( num.participants = c(20,40,60), num.sims = 500,                 
+<<eval=FALSE>>=
+pow_mc <- power.calc( num.participants = c(20,40,60), num.sims = 500,                 
 	test.type = "count", sig.level = 0.05, 
 	vitdcurves.placebo = control, vitdcurves.treatment = treatment, 
 	baseline = 0.03, RR = c(2,3,4), rate = 1, 
 	intensity.func = intensfun, holding.time = 2, mc.error=10 )
 	
-R> plot(pow_mc)
-\end{CodeInput}
+plot(pow_mc)
+@
 
 \begin{figure}[h!]
 \centering
@@ -484,14 +488,14 @@ R> plot(pow_mc)
 
 For the crossover design there are two options. Participants swap from placebo to either one of fixed or dynamic dosing. In the code below, a two year trial is considered, with a crossover from placebo to dynamic dosing after the first year.  
 
-\begin{CodeInput}
-R> crossover <- vitd.curve( 20, type = "cross-placebo-dynamic-dose", 
+<<eval=FALSE>>=
+crossover <- vitd.curve( 20, type = "cross-placebo-dynamic-dose", 
               		start = 0, end = 2, cross = 1, 
              	 	Max.Height = 80, Min.Height = 10, Flat.Height = 50,
               		Spread.Min = 10, Spread.Max = 10, Spread.FH = 20 )
 
-R> plot(crossover)
-\end{CodeInput}
+plot(crossover)
+@
 The plot output is shown in Figure~\ref{fig:crossover} where the cross from placebo to supplementation is clear. 
 
 \begin{figure}[h!]
@@ -502,15 +506,15 @@ The plot output is shown in Figure~\ref{fig:crossover} where the cross from plac
 
 Approximation of the power can also be carried out using \code{pow.calc()}. In this case, only the \code{vitdcurves.treatment} argument will be passed. Figure~\ref{fig:crossover-pow} shows the approximate power. 
 
-\begin{CodeInput}
-R> pow_cross <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
+<<eval=FALSE>>=
+pow_cross <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
                    test.type = "crossover", sig.level = 0.05, 
                    vitdcurves.treatment  = crossover, 
                    baseline = 0.03, RR = c(2,3,4), rate = 1, 
                    intensity.func = intensfun, holding.time = 2, mc.error=10 )
 
-R> plot(pow_cross)
-\end{CodeInput}
+plot(pow_cross)
+@
 
 \begin{figure}[h!]
 \centering

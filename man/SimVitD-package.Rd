@@ -11,8 +11,8 @@ Simulation tools for planning vitamin D studies including power estimation. Popu
 \tabular{ll}{
 Package: \tab SimVitD\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2019-04-10\cr
+Version: \tab 1.0.1\cr
+Date: \tab 2019-06-14\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }

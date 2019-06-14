@@ -9,7 +9,7 @@
                         vitdcurves.placebo, vitdcurves.treatment,
                         baseline = 0.03, RR = 3,
                         rate = 1, intensity.func = intensity.extreme, 
-                        holding.time = 2, mc.error = 1 )
+                        holding.time = 2, mc.error = 1, lohi.vit = c(10,70) )
 }
 \arguments{
   \item{num.participants}{Numeric, the number of participants in each group to calculate the power for.}
@@ -35,6 +35,8 @@
   \item{holding.time}{Numeric, the mean number of weeks for the holding time.}
   
   \item{mc.error}{Number of times to repeat the experiment at each \code{num.participants} value to explore Monte Carlo error.}
+  
+  \item{lohi.vit}{Inflection points of the relative risk curve used in \code{infection.count}.}
 }
 
 \details{If \code{test.type} is equal to \code{crossover} then \code{vitdcurves.placebo} is ignored and \code{vitdcurves.treatment} should contain curves constructed using one of the crossover options. If \code{test.type} is equal to \code{proportions} and \code{num.participants} is small, warning messages from \code{prop.test} may appear.}
