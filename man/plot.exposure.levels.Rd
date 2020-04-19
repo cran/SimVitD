@@ -14,5 +14,3 @@
     \item{col}{Character, value for the colour of the points.}
     \item{\dots}{Additional arguments to be passed to the \code{plot} function.}
   }
-
-\author{Rebecca Mangan}

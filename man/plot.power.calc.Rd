@@ -22,5 +22,3 @@
     \item{legend.size}{Numeric, a value for the size of the legend.}
     \item{\dots}{Additional arguments to be passed to the \code{plot} function.}
   }
-
-\author{Rebecca Mangan}

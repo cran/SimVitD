@@ -20,5 +20,3 @@
 
   \code{\link{pvalue.calc}} returns a list with the summary from the test and the pvalue.
 }
-
-\author{Rebecca Mangan}

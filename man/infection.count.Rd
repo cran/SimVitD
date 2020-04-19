@@ -42,5 +42,3 @@
 
 }
 
-\author{Rebecca Mangan}
-

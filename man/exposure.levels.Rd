@@ -28,4 +28,3 @@
   \item{levels}{The vitamin D staus levels for each participant at the time of exposure to infection.}
   }
   
-\author{Rebecca Mangan}

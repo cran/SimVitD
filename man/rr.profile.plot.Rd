@@ -12,8 +12,6 @@
   \item{infect}{An object of class \code{infection.count}.}
 }
 
-\author{Rebecca Mangan}
-
 \examples{
 # simulate vitamin D profiles
 profiles <- vitd.curve( N = 10, type = "placebo" )

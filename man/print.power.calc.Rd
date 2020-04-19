@@ -13,6 +13,3 @@
 
 }
 
-\author{Rebecca Mangan}
-
-

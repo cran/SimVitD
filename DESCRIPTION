@@ -1,7 +1,7 @@
 Package: SimVitD
 Type: Package
 Title: Simulation Tools for Planning Vitamin D Studies
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c( person( "Rebecca", "Mangan", email="manganre@tcd.ie", role = c( "aut" ) ), person( "Jason", "Wyse", email = "wyseja@tcd.ie", role = c("aut","cre") ), person("Lina", "Zgaga", email="zgagal@tcd.ie", role= "aut") )
 Description: Simulation tools for planning Vitamin D studies including
              approximation of power. Individual vitamin D status 
@@ -16,6 +16,6 @@ Depends: poisson
 Encoding: UTF-8
 LazyData: true
 NeedsCompilation: no
-Packaged: 2019-06-14 12:25:00 UTC; jason
+Packaged: 2020-04-19 17:37:31 UTC; jason
 Repository: CRAN
-Date/Publication: 2019-06-14 12:40:12 UTC
+Date/Publication: 2020-04-19 18:30:02 UTC

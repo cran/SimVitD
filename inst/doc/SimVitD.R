@@ -8,7 +8,7 @@ options(prompt = "R> ", continue="...")
 
 
 ###################################################
-### code chunk number 2: SimVitD.Rnw:343-351 (eval = FALSE)
+### code chunk number 2: SimVitD.Rnw:293-301 (eval = FALSE)
 ###################################################
 ## control <- vitd.curve( 20, type = "placebo", start = 0, end = 1, Min.Height = 10, 
 ## 				Max.Height = 80, Spread.Min = 10, Spread.Max = 10 )
@@ -21,7 +21,7 @@ options(prompt = "R> ", continue="...")
 
 
 ###################################################
-### code chunk number 3: SimVitD.Rnw:371-382 (eval = FALSE)
+### code chunk number 3: SimVitD.Rnw:321-332 (eval = FALSE)
 ###################################################
 ## intensfun <- intensity.function( summer.rate = 0, winter.rate = 1, flu = TRUE )
 ## 
@@ -37,7 +37,7 @@ options(prompt = "R> ", continue="...")
 
 
 ###################################################
-### code chunk number 4: SimVitD.Rnw:387-393 (eval = FALSE)
+### code chunk number 4: SimVitD.Rnw:337-343 (eval = FALSE)
 ###################################################
 ## plot(control)
 ## plot(control_expos)
@@ -48,21 +48,21 @@ options(prompt = "R> ", continue="...")
 
 
 ###################################################
-### code chunk number 5: SimVitD.Rnw:400-402 (eval = FALSE)
+### code chunk number 5: SimVitD.Rnw:350-352 (eval = FALSE)
 ###################################################
 ## rr.curve.plot(control_expos, control_inf )
 ## rr.curve.plot(treatment_expos, treatment_inf )
 
 
 ###################################################
-### code chunk number 6: SimVitD.Rnw:422-424 (eval = FALSE)
+### code chunk number 6: SimVitD.Rnw:372-374 (eval = FALSE)
 ###################################################
 ## rr.profile.plot( control, control_expos, control_inf )
 ## rr.profile.plot( treatment, treatment_expos, treatment_inf )
 
 
 ###################################################
-### code chunk number 7: SimVitD.Rnw:443-452 (eval = FALSE)
+### code chunk number 7: SimVitD.Rnw:393-402 (eval = FALSE)
 ###################################################
 ## pow <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
 ##         test.type = "count", sig.level = 0.05, 
@@ -76,7 +76,7 @@ options(prompt = "R> ", continue="...")
 
 
 ###################################################
-### code chunk number 8: SimVitD.Rnw:471-478 (eval = FALSE)
+### code chunk number 8: SimVitD.Rnw:421-428 (eval = FALSE)
 ###################################################
 ## pow_mc <- power.calc( num.participants = c(20,40,60), num.sims = 500,                 
 ## 	test.type = "count", sig.level = 0.05, 
@@ -88,7 +88,7 @@ options(prompt = "R> ", continue="...")
 
 
 ###################################################
-### code chunk number 9: SimVitD.Rnw:491-497 (eval = FALSE)
+### code chunk number 9: SimVitD.Rnw:441-447 (eval = FALSE)
 ###################################################
 ## crossover <- vitd.curve( 20, type = "cross-placebo-dynamic-dose", 
 ##               		start = 0, end = 2, cross = 1, 
@@ -99,7 +99,7 @@ options(prompt = "R> ", continue="...")
 
 
 ###################################################
-### code chunk number 10: SimVitD.Rnw:509-516 (eval = FALSE)
+### code chunk number 10: SimVitD.Rnw:459-466 (eval = FALSE)
 ###################################################
 ## pow_cross <- power.calc( num.participants = c(20,40,60), num.sims = 500, 
 ##                    test.type = "crossover", sig.level = 0.05, 

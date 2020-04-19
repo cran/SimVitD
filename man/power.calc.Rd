@@ -60,8 +60,6 @@
 
 }
 
-\author{Rebecca Mangan}
-
 
 \examples{
 # simulate placebo group

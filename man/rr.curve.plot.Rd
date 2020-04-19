@@ -18,5 +18,3 @@
     \item{cex}{Numeric, value giving the amount by which plotting the points should be magnified.}
 
   }
-
-\author{Rebecca Mangan}

@@ -14,5 +14,3 @@
   \item{ylab}{A title for the y-axis.}
   \item{\dots}{Additional arguments to the \code{plot} function.}
 }
-
-\author{Rebecca Mangan}

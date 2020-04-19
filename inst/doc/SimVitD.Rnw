@@ -18,12 +18,12 @@
 \setlength{\unitlength}{1cm}
 
 
-\usepackage{tikz}
-\usetikzlibrary{decorations.pathreplacing}
-\usepackage{tkz-graph}
-\usetikzlibrary{shapes.geometric}
-\usetikzlibrary{shapes.multipart}
-\usetikzlibrary{arrows,topaths}
+%\usepackage{tikz}
+%\usetikzlibrary{decorations.pathreplacing}
+%\usepackage{tkz-graph}
+%\usetikzlibrary{shapes.geometric}
+%\usetikzlibrary{shapes.multipart}
+%\usetikzlibrary{arrows,topaths}
 %\usepackage{cite}
 
 
@@ -58,7 +58,7 @@
  }
  
 \Abstract{
-\pkg{SimVitD} provides simulation based tools to compare supplementation schemes in vitamin D studies. These tools aim to account for and characterise key sources of variability and heterogeneity in vitamin D benefit. Seasonal variation in solar radiation is pronounced, which gives a natural sinoid variation in vitamin D status; consequently, the relative contribution of a vitamin D supplementation to the overall vitamin D status, and it's impact, will vary seasonally. Functionality to approximate the power of a study comparing two supplementation schemes via simulation is easily accessible.
+\pkg{SimVitD} provides simulation based tools to compare supplementation schemes in vitamin D studies. These tools aim to account for and characterise key sources of variability and heterogeneity in vitamin D benefit. Seasonal variation in solar radiation is pronounced, which gives a natural sinusoidal variation in vitamin D status; consequently, the relative contribution of a vitamin D supplementation to the overall vitamin D status, and it's impact, will vary seasonally. Functionality to approximate the power of a study comparing two supplementation schemes via simulation is easily accessible.
 }
 \Keywords{Statistical power, sample size determination, heterogeneity of treatment effect}
 \Plainkeywords{Statistical power, sample size determination, heterogeneity of treatment effect}
@@ -82,7 +82,7 @@ options(prompt = "R> ", continue="...")
 A large number of observational studies in humans suggest that vitamin D deficiency can have detrimental impacts on health~\citep{Theodoratou14}. Further, hundreds of experimental studies in animals and cell lines describe underlying (patho)physiological mechanisms associated with deficiency. Majority of an individual's vitamin D is derived from ultraviolet B (UVB) exposure~\citep{Webb88,OSullivan19}, and hence follows a strong seasonal pattern. The usefulness of vitamin D in providing immune protection against common maladies is affected by this seasonality. As well as a heterogeneous treatment effect (HTE) between individuals taking a vitamin D supplement, there may be a large intra-individual heterogeneity in the general effectiveness of supplementation depending on the season. \newline
 
 
-The package \pkg{SimVitD} presents simulation based tools to aid planning the comparison of supplementation schemes in vitamin D studies, which aim to account for a set of perceived sources of variability and heterogeneity in vitamin D benefit. As seasonal variation in solar radiation is pronounced, there will be a natural, sinoid variation in vitamin D status; consequently, the relative contribution of vitamin D supplementation to the overall vitamin D status, and it's impact, will vary seasonally: while vitamin D supplementation may contribute the majority of the vitamin D in Winter, the same dose may be relatively insignificant in the Summer. Some of the \pkg{SimVitD} schemes are shown in Figures~\ref{fig:fixed-dose} and~\ref{fig:dynamic-dose}. \newline
+The package \pkg{SimVitD} presents simulation based tools to aid planning the comparison of supplementation schemes in vitamin D studies, which aim to account for a set of perceived sources of variability and heterogeneity in vitamin D benefit. As seasonal variation in solar radiation is pronounced, there will be a natural, sinusoidal variation in vitamin D status; consequently, the relative contribution of vitamin D supplementation to the overall vitamin D status, and it's impact, will vary seasonally: while vitamin D supplementation may contribute the majority of the vitamin D in Winter, the same dose may be relatively insignificant in the Summer. Some of the \pkg{SimVitD} schemes are shown in Figures~\ref{fig:fixed-dose} and~\ref{fig:dynamic-dose}. \newline
 
 
 Calculating the study power of a randomised control trial or the sample size required for a given power is non-trivial under such circumstances. \pkg{SimVitD} uses simulation of exposures and infections at an individual level (microsimulation), to investigate the effects of various vitamin D interventions on disease rates within a study group. Individual vitamin D status trajectories are simulated throughout the year for two or more groups, exposures and incidencesof infections are simulated based on disease risk at the time of the exposure. The power of the study (or the sample size needed to obtain a given power) can be approximated via simulation. These tools can be utilised in the planning of vitamin D studies.  \newline
@@ -260,57 +260,7 @@ The rejection decision depends on a significance level $\alpha$, giving the prob
 
 \begin{figure}[!h]
 \begin{center}
-\hspace*{-1cm}\fbox{
-\begin{tikzpicture}
-  \tikzstyle{sta} = [rectangle, rounded corners,draw,minimum width=20pt]
-	
-\node[text width = 90pt] (propw) at (3,5.2) {\bf{Carry out a test of $H_0$ for each study}};
-
-\node[text width = 90pt] (prop) at (-1,5.2) {\bf{Simulate many instances of the study}};
-	
-	\node[text width = 120pt] (propr) at (7.5,5.2) {\bf{Combine all decisions to approximate power}};
-	
-	
-	\node[text width = 120pt] (propq) at (-6,5.2) {\bf{Specify settings for simulation of indivuals in schemes $A$ and $B$} };	
-
-	\node[sta,text width = 120pt] (orig1) at (-6,1) {Give $n$ and settings for simulation
-	of vitamin D profiles under schemes $A$ and $B$, exposures rate function $\lambda(t)$, $p_0$, $g(x)$, hypotheses to test $H_0,H_A$ and $\alpha$.  }; 
-	
-\node[sta,text width = 110pt] (origend) at (7,1) { Approximate the power via \[\widehat{\mbox{Power}} = \frac{\mbox{\# $H_0$ rejected}}{N}\] }; 	
-	
-	
-	%\node (orig1) at (-5,1) {};
-	\node[sta] (mv1) at (-1.5,3) {Study 1}; 
-  	\node[sta] (mv2) at (-1.5,1.5) {Study 2}; 
-  	\node[sta] (mv3) at (-1.5,-1) {Study $N$}; 
-  	
-  	\node (mvd) at (-1,0.5) {$\vdots$};
-  	\node (mvd) at (-1,0) {$\vdots$};
-  	
-  	\node[sta] (mvv1) at (2,3) {$H_0$ decision 1}; 
-  	\node[sta] (mvv2) at (2,1.5) {$H_0$ decision 2}; 
-  	\node[sta] (mvv3) at (2,-1) {$H_0$ decision $N$}; 
-  	
-  	\node (mvd) at (2.5,0.5) {$\vdots$};
-  	\node (mvd) at (2.5,0) {$\vdots$};
-  	
-  	%\draw[-] (orig) edge (orig1);
-  	\draw[->]   (orig1) edge (mv1);
-  	\draw[->]  	(orig1) edge (mv2);
-  	\draw[->] 	(orig1) edge (mv3);
-  	
-  	%\draw[-] (orig) edge (orig1);
-  	\draw[->]   (mv1) edge (mvv1);
-  	\draw[->]  	(mv2) edge (mvv2);
-  	\draw[->] 	(mv3) edge (mvv3);
-  	
-  	\draw[->]   (mvv1) edge (origend);
-  	\draw[->]  	(mvv2) edge (origend);
-  	\draw[->] 	(mvv3) edge (origend);
-  	
-
-\end{tikzpicture}
-}
+\frame{\includegraphics[scale=2]{sim-pow-outline}}
 \end{center}
 \caption{Flowchart showing the simulation process for estimating the power of a study.} \label{fig:flowchart}
 \end{figure}

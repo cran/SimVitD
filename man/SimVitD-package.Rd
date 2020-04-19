@@ -17,15 +17,17 @@ License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }
 
-\code{SimVitD} assumes the study focus is on the immunoprotective benefits against some infectious agent (or protection against some event to which study participants are exposed intermittently). The core elements of the simulation involve 
+Power calculations in \code{SimVitD} proceed by simulating many realisations of a study. Within each study, individuals' vitamin D status trajectories and potential exposures and protections from infections are simulated separately. This is akin to a microsimualation. The core steps of the simulation approach being proposed are:
   
-  (i) simulation of an individual's vitamin D status profile which, without supplementation, will is  assumed sinusoidal in shape, with a cycle of 1 year and a natural trough in Winter time
-  
-  (ii) simulation of exposures to an infectious agent in the individual's envrionment
-  
-  (iii) simulation of the the immuno response (developing infection or not) having being exposed, which will be dependent on the individual's vitamin D status at time of exposure.
-  
-There is functionality to carry out estimation of the power of detecting differences between different supplementation schemes through simulation. This can be expanded to aid in study planning and design.
+    (i) simulation of an individual's vitamin D status trajectory
+    
+    (ii) simulation of an individual's exposures to infectious agents
+    
+    (iii) determination of the probability of developing infection at each exposure time, dependent on an individual's vitamin D status at exposure
+    
+    (iv) simulation of contracting an infection at conditional on step (iii).
+
+There is functionality to carry out estimation of the power of detecting differences between different types of supplementation schemes. This can be expanded to aid in study planning and design.
 
 The fuctions \code{\link{vitd.curve}} and \code{\link{exposure.levels}} and the accompanying documentation provide a gateway into the simulation tools. Estimation of the power of detecting differences in treatment effects are based on microsimulation; a proposed study is simulated a large number of times and within each of these studies individual vitamin D status profiles are generated to reflect variability in the population. The package considers immunoprotective effects of vitamin D; within each study, exposures to an infectious agent are simulated for each individual. For each exposure, the immune response modulated by the individual's vitamin D status is also simulated. The resulting datasets of cases/non-cases provide the basis for empirical power estimation.
 }

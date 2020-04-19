@@ -74,5 +74,3 @@
   \item{north.hemi}{Flag for which hemisphere the study is taking place in.}
 }
 
-\author{Rebecca Mangan}
-

@@ -13,6 +13,4 @@
 
 }
 
-\author{Rebecca Mangan}
-
 

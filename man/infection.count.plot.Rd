@@ -14,5 +14,3 @@
     \item{cex}{Numeric, value giving the amount by which plotting the points should be magnified.}
     \item{col}{Character, value for the colour of the points.}
   }
-
-\author{Rebecca Mangan}

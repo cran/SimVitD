@@ -23,6 +23,3 @@
           the returned function acts as
           \code{intensity.func} for input to \code{\link{exposure.levels}}.
 }
-
-
-\author{Rebecca Mangan}

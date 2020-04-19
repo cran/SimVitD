@@ -12,5 +12,3 @@
    \item{\dots}{Optional arguments to lower level functions.}
 }
 
-\author{Rebecca Mangan}
-
