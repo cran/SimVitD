@@ -2,18 +2,16 @@ summary.vitd.curve <- function( object, ... ){ # have to put in if loop if treat
   
   x <- object
   
-  type <- x$type # test for type of vitamin d curve 3 - placebo/trad 4 - treatment
+  type <- x$type # test for type of vitamin D curve 3 - placebo/trad 4 - treatment
 
+  cat("\tLength of study:",(length( x$time )-1)/(12*x$res),"years")
+  cat("\n\tNumber of participants:",nrow(x$curves$curves.eval))
+  cat("\n\tExpected 25OHD level:",round(x$mu),"nmol/L")
+  
   if( type == "placebo" | type ==  "fixed-dose"){
-    cat("\n Length of study is",(length( x$time )-1)/24,"years")
-    cat("\n Number of participants is",nrow(x$curve$outp))
-    cat("\n Minimum vitamin d levels of participants:\n\t",round(x$curve$min.heights,1))
-    cat("\n Maximum vitamin d levels of participants:\n\t",round(x$curve$max.heights, 1))
+    if( type == "fixed-dose" ) cat("\n\tSupplement 25OHD contribution:",round(x$supp.dose),"nmol/L")
   }else{
-    cat("\n Length of study is",(length( x$time )-1)/24,"years")
-    cat("\n Number of participants is",nrow(x$curve$outp))
-    cat("\n Minimum vitamin d levels of participants:\n\t",round(x$curve$flatheights,1))
-    cat("\n Maximum vitamin d levels of participants:\n\t",round(x$curve$max.heights, 1))
+    cat("\n\tThreshold 25OHD level:",round(x$dyn.dose.thresh),"nmol/L")
   }
 }
 

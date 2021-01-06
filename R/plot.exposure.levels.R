@@ -1,8 +1,7 @@
-plot.exposure.levels <- function( x, pch = 1, cex = 1.3, col = "red", ... ){
+plot.exposure.levels <- function( x, col = "blue", ... ){
   if( .Device == "null device") stop("plot.vitd.curve must be called before plot.exposure.levels")
-  N <- ncol(x[[1]])
+  n <- nrow(x[[1]])
   time <- x[[1]]
-  for( i in 1:N )
-    points( time[,i], x[[2]][i,], pch = pch, cex = cex, col = col )
+  for( i in 1:n ) points( time[i,], x[[2]][i,], col=col, ... )
 }
 

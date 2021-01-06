@@ -1,81 +1,61 @@
-vitd.curve <- function( N, type = c("placebo","fixed-dose","dynamic-dose", "cross-placebo-fixed-dose", "cross-placebo-dynamic-dose"), start = 0, end = 2, cross = .5*(start + end),  Min.Height = 10, Max.Height = 80, Flat.Height = 50, Spread.Min = 1, Spread.Max = 1, Spread.FH = 1, supp.dose = 20, north.hemi = TRUE, res = 40  ){
+vitd.curve <- function( n = 1, type = c("placebo","fixed-dose","dynamic-dose"), start = 0, end = 1,  
+                        mu = 45, amplitude = 35, dyn.dose.thresh = 50, sd.mu = 5, sd.amplitude = 5, sd.dyn.dose.thresh = 5, 
+                        supp.dose = 20, supp.dose.rate = Inf, weight = 1, sd.weight = 0, min.thresh = 10, north.hemi = TRUE, res = 40  )
+{
   
-  if( !( type %in% c("placebo","fixed-dose","dynamic-dose", "cross-placebo-fixed-dose", "cross-placebo-dynamic-dose") ) )
-    stop("Argument 'type' is not valid.")
-  
+  type <- type[1]
+  if( !( type %in% c("placebo","fixed-dose","dynamic-dose") ) ) stop("Argument 'type' is not valid")
+
   if( any( c(start < 0, end < 0, end <= start ) ) ) stop("Arguments 'start' and 'end' must be positive with 'end' > 'start'")
-  if( any( c(Min.Height < 0, Max.Height < 0, Max.Height < Min.Height) ) ) stop("Arguments 'Min.Height' and 'Max.Height' must be positive with 'Max.Height' > 'Min.Height'")
-  #if( Flat.Height < 0 | Flat.Height > Max.Height ) stop("Argument Flat.Height must be positive. Sensible values will be less than 'Max.Height'.")
-  if( any( c(Spread.Min < 0, Spread.Max < 0, Spread.FH < 0) ) ) stop( "Arguments 'Spread.Min', 'Spread.Max', 'Spread.FH' must be positive." ) 
-  if( supp.dose < 0 ) stop("Argument 'supp.dose' must be positive.")
+  if( any( c( mu < 10, mu  < amplitude ) ) ) stop("Please check arguments mu and amplitude are sensible")
+  if( any( c(sd.mu < 0, sd.amplitude < 0, sd.dyn.dose.thresh < 0 ) ) ) stop( "Arguments 'sd' must be positive " ) 
+  if( supp.dose < 0 ) stop("Argument 'supp.dose' must be positive")
   
-  if ( N > 1 ){
-    Amplitude <- Max.Height - Min.Height
-    Height <- Min.Height
-    years <- end - start
-    time1 <- seq( start*pi, end*pi, length.out=years*(12*res) + 1 ) # pi is one year
-    cross1 <- cross*pi
-    time <- ( time1 * (12/pi) ) # gives time in terms of months
-    
-    if( Spread.Min > 100 || Spread.Max > 100 || Spread.FH > 100 
-        || Spread.Min < 1 || Spread.Max < 1 || Spread.FH < 1 ) stop("Spread must be from 1-100")
-    
-    Spread.A <- 100 / Spread.Max
-    Spread.H <- 100 / Spread.Min
-    Spread.FH <- 100 / Spread.FH
-    
-    if( type == "placebo" ){
-      
-      y <- list( time, random.sine( N , k.A = Spread.A, k.H = Spread.H, H.0 = Height,
-                                    A.0 = Amplitude, time = time1 ), Height, Max.Height,
-                 Spread.Min, Spread.Max, Spread.FH, type, supp.dose, north.hemi, res )
-      names( y ) <- c( "time", "curve", "min.height", "max.height", "spread.min", "spread.max",
-                       "spread.fh", "type", "supp.dose", "north.hemi", "res" )
-      names( y[[2]] ) <- c( "outp", "min.heights", "max.heights" )
-      
-    }else if( type == "fixed-dose" ){
-      
-      y <- list( time, random.sine( N , k.A = Spread.A, k.H = Spread.H, H.0 = supp.dose + Height,
-                                    A.0 = Amplitude, time = time1 ), Height, Max.Height,
-                 Spread.Min, Spread.Max, Spread.FH, type, supp.dose, north.hemi, res )
-      names( y ) <- c( "time", "curve", "min.height", "max.height", "spread.min", "spread.max",
-                       "spread.fh", "type", "supp.dose", "north.hemi", "res" )
-      names( y[[2]] ) <- c( "outp", "min.heights", "max.heights" )
-      
-    }else if( type == "dynamic-dose" ){
-      
-      y <- list( time, random.flatsine( N, k.A = Spread.A, k.H = Spread.H,
-                                        k.FH = Spread.FH, H.0 = Height,
-                                        A.0 = Amplitude, FH.0 = Flat.Height, time = time1 ), Height, Max.Height,
-                 Flat.Height, Spread.Min, Spread.Max, Spread.FH, type, supp.dose, north.hemi, res )
-      names( y ) <- c( "time", "curve", "min.height", "max.height", "flatheight",
-                       "spread.min", "spread.max", "spread.fh", "type", "supp.dose", "north.hemi", "res" )
-      names( y[[2]] ) <- c( "outp", "min.heights", "max.heights", "flatheights" )
-      
-    }else if( type == "cross-placebo-fixed-dose" ){ 
-      
-      y <- list( time, random.sine( N , k.A = Spread.A, k.H = Spread.H, H.0 = Height,
-                                    A.0 = Amplitude, time = time1, cross=cross1, delta=supp.dose ), Height, Max.Height,
-                 Spread.Min, Spread.Max, Spread.FH, type, supp.dose, north.hemi, cross1, res )
-      names( y ) <- c( "time", "curve", "min.height", "max.height", "spread.min", "spread.max",
-                       "spread.fh", "type", "supp.dose", "north.hemi", "cross", "res" )
-      names( y[[2]] ) <- c( "outp", "min.heights", "max.heights" )
-      
-    }else if( type == "cross-placebo-dynamic-dose" ){
-      
-      y <- list( time, random.flatsine( N, k.A = Spread.A, k.H = Spread.H,
-                                        k.FH = Spread.FH, H.0 = Height,
-                                        A.0 = Amplitude, FH.0 = Flat.Height, time = time1, cross=cross1 ), Height, Max.Height,
-                 Flat.Height, Spread.Min, Spread.Max, Spread.FH, type, supp.dose, north.hemi, cross1, res )
-      names( y ) <- c( "time", "curve", "min.height", "max.height", "flatheight",
-                       "spread.min", "spread.max", "spread.fh", "type", "supp.dose", "north.hemi", "cross", "res" )
-      names( y[[2]] ) <- c( "outp", "min.heights", "max.heights", "flatheights" )
-      
+  cross <- .5*(start + end) # not used
+  
+  years <- end - start
+  time1 <- seq( start*pi, end*pi, length.out=years*(12*res) + 1 ) # pi is one year
+  cross1 <- cross*pi
+  time <- ( time1 * (12/pi) ) # gives time in terms of months
+  
+  if( type == "placebo" ) 
+  {
+    supp.dose <- 0
+    delta <- rep(supp.dose,n)
+    shape1 <- 1 # irrelevant- does not contribute here
+    shape2 <- 1
+    sd.dyn.dose.thresh <- 0
+  }else if( type == "fixed-dose"){
+    delta <- rtrexp( n, supp.dose.rate, supp.dose)   # allow for variable uptake in supplementation
+    #delta <- rep(supp.dose,n) 
+    sd.weight <- ( (weight == 0 || weight == 1) & sd.weight == 0 ) * 0 + ( (weight > 0 & weight < 1) & sd.weight == 0 ) *  1e-4
+    var.weight <- sd.weight^2
+    c0 <- weight*(1-weight)/var.weight - 1
+    shape1 <- weight*c0
+    shape2 <- (1-weight)*c0
+    if( sd.weight == 0 )
+    {
+      if( weight == 1 ){ shape1 <- Inf; shape2 <- 1 }
+      if( weight == 0 ){ shape1 <- 1; shape2 <- Inf }
     }
-    
-    class( y ) <- "vitd.curve"
-    return( y )
-    
-  }else{ stop("Invalid number of participants: N must be > 1") } # warning or stop?
+    sd.dyn.dose.thresh <- 0
+  }else if( type == "dynamic-dose"){
+    supp.dose <- 0
+    delta <- rep(supp.dose,n)
+    shape1 <- 1 # irrelevant- does not contribute here
+    shape2 <- 1
+  }
+  
+  if( sd.amplitude == 0 ) sd.amplitude <- 1e-4
+  
+  y <- list( time, random.cosine( n , k.A = sd.amplitude, k.H = sd.mu, k.T = sd.dyn.dose.thresh, H.0 = mu,
+                                  A.0 = amplitude, T.0 = dyn.dose.thresh, time = time1, delta=delta, tau=min.thresh, shape1=shape1, shape2=shape2 ), 
+             mu, amplitude, dyn.dose.thresh,
+             sd.mu, sd.amplitude, sd.dyn.dose.thresh, type, supp.dose, supp.dose.rate, weight, sd.weight, min.thresh, north.hemi, res, start, end, res )
+  names( y ) <- c( "time", "curves", "mu", "amplitude", "dyn.dose.thresh", "sd.mu", "sd.amplitude", "sd.dyn.dose.thresh",
+                   "type", "supp.dose", "supp.dose.rate", "weight", "sd.weight", "min.thresh", "north.hemi", "res", "start", "end", "res" )
+  
+  class( y ) <- "vitd.curve"
+  return( y )
   
 }

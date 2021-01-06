@@ -1,3 +1,4 @@
+#################################################################
 
 # Functions to be used for Vitamin D Simulation
 
@@ -25,80 +26,62 @@ intensity.extreme <- function(t)
 }
 
 #################################################################
-# Function that returns N random sine curves, amplitudes and heights
-random.sine <- function( N = 1, k.H=5, k.A=5, H.0=5, A.0=75, time, cross=0, delta=0  )
+# Function that returns n random cosine curves, amplitudes and heights
+random.cosine <- function( n=1, k.H=1, k.A=1, k.T=1, H.0=45, A.0=35, T.0=50, time=NULL, cross=-1, delta=20, tau=10, shape1=1, shape2=1 )
 {
   
- timemat <- matrix( rep(time, N ), ncol=length(time),  byrow=TRUE )
- 
- A <- rgamma( N, shape=k.A^2, rate=k.A^2/A.0 )
- H <- rgamma( N, shape=k.H^2, rate=k.H^2/H.0 )
- 
- Z <- timemat > cross
- 
- outp <- H + A  * sin( timemat ) * sin( timemat ) + delta * Z
- 
- return(list(outp, H, H + A))  
-  
-}
+ timemat <- matrix( rep(time, n), ncol=length(time),  byrow=TRUE )
 
-#################################################################
-# Function that returns sine curve but returns flat line if sine value
-# drops below certain threshold (Flat.Height)
-flat.sine <- function(Flat.Height, Height, Amp, t, cross )
-{ 
-  
-  nr <- length( Flat.Height )
-  
-  timemat <- matrix( rep(t,nr), nrow=nr, byrow=TRUE )
-  
-  W <- timemat > cross
-  
-  output <- Height + Amp * sin( timemat ) * sin( timemat )
-  
-  Z <- output >= Flat.Height
-  
-  output <- ( 1 - W ) * output + (Z * output + ( 1 - Z ) * Flat.Height ) * W
-  
-  return( output )
-  
-}
-
-#################################################################
-# Function that returns N random flat sine curves, amplitudes and heights
-# input constraints for variance of variables (lower value more variance)
-# input height & amp of sine curve
-# input flat height
-random.flatsine <- function(N = 125, k.A, k.H, k.FH, A.0, H.0, FH.0, time, cross=-1 )
-{
-	
-	A <- rgamma( N, shape=k.A^2, rate=k.A^2/A.0 )
-	H <- rgamma( N, shape=k.H^2, rate=k.H^2/H.0 )
-	FH <- rgamma( N, shape=k.FH^2, rate=k.FH^2/FH.0 )
-	
-	FH[ FH < FH.0 ] <- FH.0
-
-  outp <- flat.sine( FH, H, A, time, cross )
-
-  return(list(outp, H, A + H, FH)) 
+ # convert k.A and A.0 into shape and rate
+ A <- rgamma( n, shape = (A.0/k.A)^2, rate = A.0/k.A^2 )
+ 
+ H <- rnorm( n, mean = H.0, sd = k.H )
+ 
+ omega <- rbeta( n, shape1 = shape1, shape2 = shape2)
+ 
+ thresh <- rgamma( n, shape=(T.0/k.T)^2, rate=T.0/k.T^2 )
+ 
+ supp <- delta * ( omega  + 0.5 * (1-omega) * (1 + sin(2*timemat - 3*pi/2) ) )
+ 
+ curves <- H + A * cos( 2 * timemat - pi ) + supp 
+ 
+ U <- curves < tau
+ 
+ curves <- (1-U) * curves + U * tau
+ 
+ rm(U)
+ 
+ Z <- curves - thresh
+ 
+ Z <- Z >= 0
+ 
+ curves <- Z * curves + ( 1 - Z ) * thresh 
+ 
+ return( list( curves.eval=curves, mu=H, amplitude=A, weights = omega, thresh = thresh ) )  
+ 
 }
 
 #################################################################
 # Input event times from nhpp and returns vitamin d levels
 # for flat sine curves when there are na event times
-event.height.na <- function(Flat.Height, Height, Amp, t)
+event.height.na <- function( thresh, H, A, t, tau, dose, weights)
 {
+	# evaluate curves
+  output <- H + A * cos( 2*t - pi ) + dose * ( weights + 0.5 * (1-weights) * ( 1 + sin( 2*t - 3*pi/2) ))  
+  
+  # threhold this at 10 minimum
+  U <- output < tau
+  
+  # correct for threshold
+  output <- (1-U) * output + U * tau
+  
+  # threshold
+  Z <- output - thresh
+  Z <- Z > 0
 
-	# this can be made more efficient too
-	
-  output <- Height + Amp * sin(t) * sin(t)
-  
-  Z <- output >= Flat.Height
-  
-  output <- Z * output + (1 - Z) * Flat.Height
+  output <- Z * output + (1 - Z) * thresh
   
   return( output )
-
 }
 
 
@@ -113,63 +96,44 @@ glf <- function( x, l.asym, u.asym, intercept, slope )
 
 #################################################################
 # Input vector with binary disease (0, 1), vector of event times,
-# rate - ouput vector with binary disease including holidaing time
+# rate - ouput vector with binary disease including holding time
 
-holding.time <- function(disease.vec, t, rate){
+holding.time <- function( infect, t, rate)
+{
   
-  disease <- t( disease.vec )
+  n <- nrow( infect )
+  m <- ncol( infect )
   
-  nr <- nrow( disease )
-  nc <- ncol( disease )
-  
-  hold.times <- matrix( rexp( nr*nc, rate ), nrow=nr, ncol=nc )
+  hold.times <- matrix( rexp( n*m, rate ), nrow=n, ncol=m )
   
   tphold <- t + hold.times
-  tphold <- rbind( t[1,], tphold[1:(nr-1),] )
+  if( n == 1 ){ 
+    tphold <- matrix( c( t[,1], tphold[,1:m-1]), ncol=m, nrow=1 ) 
+  }else{ 
+    tphold <- cbind( t[,1], tphold[,1:(m-1)] ) ## the issue is here with scalar
+  }
   
-  Z <- ( t < tphold ) * disease
+  tphold[ is.na(tphold) ] <- 0 # to make sure no times following NA are knocked out
   
-  disease <- disease - Z
+  Z <- ( t < tphold ) * infect # gives TRUE where event is before next time
   
-  return( t(disease) )
+  infect <- infect - Z # knocks out bad times
+  
+  return( infect )
 
 }
 
 #################################################################
-# Input vector of event times from nhpp and end time of study
-# output vector with NAs for event times after end of study
-eventtimes.end <- function(t, end){
-  
-  U <- which( t > end, arr.ind = TRUE )
-  
-  for( k in 1:nrow(U) ) t[ U[k,1], U[k,2] ] <- NA
-  
-  return(t)
-}
-
-#################################################################
-# Input empty matrix to fill, matrix of random uniformly distr,
-# matrix of probs from OR curve
-# Output matrix of (0,1) whether person got disease or not
-disease_test <- function(u, prob){
-  
-  return( u < prob )
-  
-}
-
-#################################################################
-# Function that takes matrix and returns columns
-# with NA after certain time
-
-f1 <- function(z)
+# Truncated exponential for fixed increase
+# 
+rtrexp <- function(n, lambda, ub)
 {
-  z[ z > pi ] <- NA
-  return(z)
+  u <- runif(n)
+  ub + log( exp(- lambda*ub) + (1-exp(- lambda* ub) ) * u ) / lambda
 }
 
-f2 <- function(z)
+dtrexp <- function(x, lambda, ub)
 {
-  z[ z > 2*pi ] <- NA
-  return(z)
+  lambda * exp(-lambda*(ub-x)) / (1-exp(- lambda* ub) )
 }
 

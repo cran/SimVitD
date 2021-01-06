@@ -1,69 +1,37 @@
-# x is an object of class vitd.curve
-exposure.levels <- function( x, rate,
-                             intensity.func = intensity.function(), end = 1 ){
-  
+exposure.levels <- function( x, rate, intensity.func = intensity.function(), end = 1 )
+{
   if( class(x) != "vitd.curve" )
     stop("Argument 'x' is not of class 'vitd.curve'")
   
-  N <- nrow(x[[2]][[1]]) # gives number of participants in the study
-  L <- rate * ( 48 / pi ) # 48/pi is one exposure per week
+  n <- nrow(x[[2]][[1]]) # gives number of participants in the study
+  L <- rate * ( 52 / pi ) # 52/pi is one exposure per week 
   start <- x$time[1] * (pi/12)
   if( end < ( x$time[1] / 12 ) ) stop( "End time must be greater than start time" )
-  
-  num.exposures  <- ( end - (x$time[1] / 12) ) * rate * 50
-  eventtimes <- nhpp.event.times( L, num.exposures, intensity.func, N, start )
 
-  f1 <- function(z) # function which returns NA when the exposure times are greater than the end time
-  {
-    z[ z > end*pi ] <- NA
-    return(z)
-  }
+  num.exposures <- ceiling( 1.5 * L * end * pi )  # simulate a conservative amount to buffer at end
 
-  eventtimes <- apply( eventtimes, 2, f1 )
+  eventtimes <- matrix( rexp( n * num.exposures, rate=L  ), ncol=n )
+  eventtimes <- apply( eventtimes, 2, cumsum )
+  eventtimes[ eventtimes > end*pi ] <- NA
   
-  # matrix of exposure times and vit D levels at exp times
-  # only as large as greatest number of exposures
-  Z <- !is.na( eventtimes )
-  lngth <- apply( Z, 2, sum )
+  prob.acc <- intensity.func( eventtimes )
+  U <- runif( n * num.exposures )
+  Z <- U < prob.acc
+  eventtimes[ !Z ] <- NA
+  
+  eventtimes <- t(eventtimes)
 
-  eventtimes <- eventtimes[1:max(lngth),]
+  mu <- x$curves$mu
+  amplitude <- x$curves$amplitude
+  weights <- x$curves$weights
   
-  type <- length(x$curve) # test for type of vitamin D curve 
+  if( x$type == "dynamic-dose" ) thresh <- x$curves$thresh else thresh <- rep(0,n)
   
-  if( x$type == "dynamic-dose"){ # corresponds to treatment
-    FH <- x$curve$flatheights
-    H <- x$curve$min.heights
-    A <- x$curve$max.heights - H
-    eventheights <- event.height.na( FH, H, A, t(eventtimes) )
-  }else if( x$type == "placebo" | x$type == "fixed-dose" ){ # corresponds to placebo / trad
-    H <- x$curve$min.heights
-    A <- x$curve$max.heights - H
-    eventheights <- H + A * sin( t(eventtimes) ) * sin( t(eventtimes) )
-  }else if( x$type == "cross-placebo-fixed-dose"){
-    eventtimes.post <- eventtimes > x$cross
-    H <- x$curve$min.heights
-    A <- x$curve$max.heights - H 
-    eventheights <- H + x$supp.dose * t(eventtimes.post) + A * sin( t(eventtimes) ) * sin( t(eventtimes) ) 
-  }else if( x$type == "cross-placebo-dynamic-dose"){
-    eventtimes.pre <- eventtimes <= x$cross
-    eventtimes.post <- eventtimes > x$cross
-    FH <- x$curve$flatheights
-    H <- x$curve$min.heights
-    A <- x$curve$max.heights - H
-    output <- H +  A * sin( t(eventtimes) ) * sin( t(eventtimes) ) 
-    Z <- output >= FH
-    eventheights <- output * t( eventtimes.pre ) + ( Z * output + (1-Z) * FH ) * t( eventtimes.post )
-  }
-  
-  if( x$type %in% c( "cross-placebo-fixed-dose", "cross-placebo-dynamic-dose" ) )
-  {
-    y <- list( eventtimes, eventheights, x$type, x$cross )
-    names( y ) <- c("exposures", "levels", "type", "cross")
-  }else{
-    y <- list( eventtimes, eventheights, x$type )
-    names( y ) <- c("exposures", "levels", "type")
-  }
-  
+  eventheights <- event.height.na( thresh, mu, amplitude, eventtimes, x$min.thresh, x$supp.dose, weights )
+
+  y <- list( eventtimes, eventheights, x$type )
+  names( y ) <- c("exposures", "levels", "type")
+
   class( y ) <- "exposure.levels"
   return( y )
 }

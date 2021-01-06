@@ -5,72 +5,51 @@
   Generates a vitamin D status profile curve for each individual in a group
 }
 \usage{
-  vitd.curve( N, type = c("placebo","fixed-dose","dynamic-dose", 
-              "cross-placebo-fixed-dose", "cross-placebo-dynamic-dose"), 
-              start = 0, end = 2, cross = 0.5*(start + end), Min.Height = 10, 
-              Max.Height = 80, Flat.Height = 50, Spread.Min = 1, 
-              Spread.Max = 1, Spread.FH = 1, supp.dose = 20, north.hemi = TRUE, res = 40 )
+vitd.curve( n = 1, type = c("placebo","fixed-dose","dynamic-dose"), start = 0, end = 1,  
+    mu = 45, amplitude = 35, dyn.dose.thresh = 50, sd.mu = 5, sd.amplitude = 5, 
+    sd.dyn.dose.thresh = 5, supp.dose = 20, supp.dose.rate = Inf, weight = 1, 
+    sd.weight = 0, min.thresh = 10, north.hemi = TRUE, res = 40 )
 }
 \arguments{
-  \item{N}{Integer, number of participants in the group.}
+  \item{n}{Number of curves to simulate.}
 
-  \item{type}{Character, type of group, one of 'placebo', 'fixed-dose', 'dynamic-dose', 'cross-placebo-fixed-dose', 'cross-placebo-dynamic-dose'.}
+  \item{type}{One of "placebo", "fixed-dose", "dynamic-dose".}
 
-  \item{start}{Integer, when the study started.}
+  \item{start}{Time in units of years when trial started.}
 
-  \item{end}{Integer, when the study ended.}
+  \item{end}{Time in units of years when trial ended.}
+
+  \item{mu}{The mean level of 25OHD in the trial arm around which there is cosine variation.}
+
+  \item{amplitude}{Amplitude of cosine function describing variation around \code{mu}}
+
+  \item{dyn.dose.thresh}{Threshold for the concentration-controlled scheme.}
+
+  \item{sd.mu}{Standard deviation levels around mean; this is the standard deviation of H in vignette.}
+
+  \item{sd.amplitude}{Standard deviation of the amplitude.}
+
+  \item{sd.dyn.dose.thresh}{Standard deviation of the participant retained concentration in the concentration-controlled trial.}
+
+  \item{supp.dose}{The 25OHD nmol/l equivalent for dosage in fixed-dose supplementation.}
   
-  \item{cross}{For crossover design, the fraction of the study before crossing over from \code{[start,end]} }
-
-  \item{Min.Height}{Numeric, mean minimum height of curves.}
-
-  \item{Max.Height}{Numeric, mean maximum height of curves.}
-
-  \item{Flat.Height}{Numeric, threshold height of curves when treatment group.}
-
-  \item{Spread.Min}{Numeric, how the minimum heights of participants are spread around the mean. 1 corresponds to narrowest spread, 100 corresponds to most scattered spread.}
-
-  \item{Spread.Max}{Numeric, how the maximum heights of participants are spread around the mean. 1 corresponds to narrowest spread, 100 corresponds to most scattered spread.}
-
-  \item{Spread.FH}{Numeric, how the flat heights of participants are spread around the mean. 1 corresponds to narrowest spread, 100 corresponds to most scattered spread.}
-
-  \item{supp.dose}{Numeric, fixed dosage administered in the traditional supplementation scheme.}
+  \item{supp.dose.rate}{Concentration parameter for fixed-dose scheme uptake. Large values imply that all participants derive the same equivalent.}
   
-  \item{north.hemi}{Logical argument. TRUE: to define summer/winter months as in the Northern Hemisphere. FALSE: to define summer/winter months as in the Southern Hemisphere.}
+  \item{weight}{For fixed-dose supplementation, this is the expected value of the proportion of the dose which is always utilized.}
+  
+  \item{sd.weight}{Standard deviation of weight}
+  
+  \item{min.thresh}{The minimum detectable threshold of 25OHD. Defaults to 10 nmol/l.}
+  
+  \item{north.hemi}{Summer/winter months as in the Northern Hemisphere if \code{TRUE} and Southern Hemisphere if \code{FALSE}.}
   
   \item{res}{Resolution parameter for plotting of vitamin D curves.}
-  
 }
 
 \value{
-
-  \code{\link{vitd.curve}} returns an object of class \code{vitd.curve} that is a list.
-  The list has the following slots.
-
-  \item{time}{The values of time in the study passed to \code{plot.vitd.curve} and \code{exposure.levels}.}
-
-  \item{curve}{A list for input to \code{plot.vitd.curve} and \code{exposure.levels} including the following slots.}
-    \item{outp}{Points to plot each individual's vitamin D curve.}
-    \item{min.heights}{The minimum height for each individual's curve.}
-    \item{max.heights}{The maximum height for each individual's curve.}
-    \item{flatheights}{The threshold level for each individual. Only returned if Treatment type.}
-  
-  \item{min.height}{The mean minimum height for the group. Used as input to \code{power.calc}.}
-
-  \item{max.height}{The mean amplitude for the group. Used as input to \code{power.calc}.}
-
-  \item{flatheight}{The mean threshold level for the group. Used as input to \code{power.calc}.}
-
-  \item{spread.min}{The group's spread around the minimum height. Used as input to \code{power.calc}.}
-
-  \item{spread.max}{The group's spread around the maximum height. Used as input to \code{power.calc}.}
-
-  \item{spread.fh}{The group's spread around the threshold level. Used as input to \code{power.calc}.}
-
-  \item{type}{The type of group. One of 'Placebo', 'Traditional', 'Treatment'. Used as input to \code{power.calc}.}
-  
-  \item{supp.dose}{The fixed supplementation dose when traditional supplementation group.}
-  
-  \item{north.hemi}{Flag for which hemisphere the study is taking place in.}
+  \code{\link{vitd.curve}} returns an object of class \code{vitd.curve}. Curve parameter settings are returned. The slot \code{curves} give the curve specific parameters for each of the \code{n} generated curves. Additionally, \code{time} used for plotting gives time values passed to \code{plot.vitd.curve}.
 }
+
+\author{Rebecca Mangan and Jason Wyse}
+
 

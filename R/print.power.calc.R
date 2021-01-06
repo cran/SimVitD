@@ -1,15 +1,15 @@
 print.power.calc <- function( x, ... ){
-  if( x$MC.rep == 1 )
+  if( x$mc.error == 1 )
   {
-    if( length(x$Npergroup) > 1 & length(x$RR) > 1 )
+    if( length(x$npergroup) > 1 & length(x$RR) > 1 )
     {
-      A <- x$Power[,1,]
-      colnames( A ) <- paste0("n=",x$Npergroup)
+      A <- x$power[,1,]
+      colnames( A ) <- paste0("n=",x$npergroup)
       rownames( A ) <- paste0("RR=",x$RR)
     }else{
-      A <- x$Power[,1,]
-      if( length(x$Npergroup) > 1 ) 
-        names(A) <- paste0("n=",x$Npergroup)
+      A <- x$power[,1,]
+      if( length(x$npergroup) > 1 ) 
+        names(A) <- paste0("n=",x$npergroup)
       else
         names(A) <- paste0("RR=",x$RR)
     }
@@ -18,31 +18,36 @@ print.power.calc <- function( x, ... ){
     names(pr) <- paste0("RR=",x$RR)
     for( i in 1:length(x$RR) )
     {
-      pr[[i]] <- apply( x$Power[i,,], 2, summary )
-      colnames( pr[[i]] ) <- paste0("n=",x$Npergroup)
+      if( length(x$npergroup) > 1){
+        pr[[i]] <- apply( x$power[i,,], 2, summary ) 
+        colnames( pr[[i]] ) <- paste0("n=",x$npergroup)
+      }else{
+        pr[[1]] <- x$power[i,,]
+        names( pr[[i]] ) <- rep( paste0("n=",x$npergroup), length(pr[[i]]) )
+      }
     }
   }
-  cat( " \n Power" )
-  if( x$MC.rep == 1 )
+  cat( "\tPower" )
+  if( x$mc.error == 1 )
   {
-    if( length(x$Npergroup) > 1 & length(x$RR) > 1 )
+    if( length(x$npergroup) > 1 & length(x$RR) > 1 )
     {
       cat("\n")
       print( round(A, 3) )
     }else{
-      if( length(x$Npergroup) > 1 ) 
+      if( length(x$npergroup) > 1 ) 
       {
         cat( paste0(" @ RR=",x$RR, "\n" ) )
         print( round(A,3) )
       }else{
-        cat( paste0(" @ n=",x$Npergroup, "\n")  )
+        cat( paste0(" @ n=",x$npergroup, "\n")  )
         print( round(A,3) )
       }
     }
   }else{
-    cat("\n")
+    cat("\n\t")
     print( pr )
   }
   
-  if( x$MC.rep > 1 ) cat( "\n Monte Carlo reps: ", x$MC.rep ) 
+  if( x$mc.error > 1 ) cat( "\n\tMonte Carlo reps: ", x$mc.error ) 
 }

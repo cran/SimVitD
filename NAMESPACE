@@ -1,17 +1,14 @@
 importFrom("grDevices", "rainbow")
 importFrom("graphics", "axis", "legend", "lines", "matplot", "points",
-             "title", "par", "boxplot")
-importFrom("stats", "binom.test", "coef", "glm", "prop.test", "rexp",
-             "rgamma", "runif", "wilcox.test")
-importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+             "title", "par", "boxplot", "abline", "plot")
+importFrom("stats", "coef", "rnorm", "rexp", "rgamma", "runif", "rbeta")
+importFrom("wBoot", "boot.two.bca")
 
-import(poisson)
 
 export(intensity.function)
 export(vitd.curve)
 export(exposure.levels)
 export(infection.count)
-export(pvalue.calc)
 export(power.calc)
 export(infection.count.plot)
 export(rr.curve.plot)
