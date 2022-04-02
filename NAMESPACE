@@ -1,8 +1,8 @@
 importFrom("grDevices", "rainbow")
 importFrom("graphics", "axis", "legend", "lines", "matplot", "points",
              "title", "par", "boxplot", "abline", "plot")
-importFrom("stats", "coef", "rnorm", "rexp", "rgamma", "runif", "rbeta")
-importFrom("wBoot", "boot.two.bca")
+importFrom("stats", "coef", "rnorm", "rexp", "rgamma", "runif", "rbeta", "pnorm", "qnorm", "quantile", "sd", "var")
+importFrom("simpleboot", "two.boot")
 
 
 export(intensity.function)

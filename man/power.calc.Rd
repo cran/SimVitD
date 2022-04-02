@@ -8,7 +8,7 @@
   power.calc( n, ratio=1, N = 500, test.type, sig.level = 0.05,
     vitdcurves.placebo = NULL, vitdcurves.treatment = NULL,
   	baseline = 0.03, RR = 3, rate = 1, intensity.func = intensity.function(), 
-  	holding.time = 2, lohi.vit = c(10,70), mc.error = 1, boot.rep = 500, 
+  	holding.time = 2, lohi.vit = c(10,70), clt = NULL, mc.error = 1, boot.rep = 9999, 
   	parallel = FALSE, num.cores = NULL, verbose=FALSE )
 }
 \arguments{
@@ -37,6 +37,8 @@
   \item{holding.time}{Expected number of weeks for the holding time.}
   
   \item{lohi.vit}{Inflection points of the relative risk curve used in \code{infection.count}.}
+  
+  \item{clt}{Logical or vector of logical values of same length as \code{n} indicating whether to use Central Limit Theorem approximation for the test when \code{TRUE}. Default is \code{NULL} and determination is automatic based on whether group size is less than 35 or not. }
   
   \item{mc.error}{Number of times to repeat the experiment at each \code{n} value to explore Monte Carlo error.}
   
@@ -87,7 +89,7 @@ intensfun <- intensity.function( summer.rate = 0, winter.rate = 1 )
 pow <- power.calc( n = c(10,20,30), 
         N = 10,  test.type = 'count', 
         vitdcurves.placebo = placebo, vitdcurves.treatment = treatment,
-        baseline = 0.03, RR = c(2,3,4), rate = 1, intensity.func = intensfun )
+        baseline = 0.03, RR = c(2,4), rate = 1, intensity.func = intensfun, boot.rep=2000 )
             
 ### NOT RUN ###            
 # approximate the Monte Carlo error in estimation of the power-- takes longer to run

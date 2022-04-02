@@ -2,7 +2,7 @@ power.calc <- function( n, ratio=1, N = 500, test.type, sig.level = 0.05,
                         vitdcurves.placebo = NULL, vitdcurves.treatment = NULL,
                         baseline = 0.03, RR = 3,
                         rate = 1, intensity.func = intensity.function(), 
-                        holding.time = 2, lohi.vit = c(10,70), mc.error = 1, boot.rep = 500, parallel = FALSE, num.cores = NULL, verbose=FALSE ){
+                        holding.time = 2, lohi.vit = c(10,70), clt = NULL, mc.error = 1, boot.rep = 9999, parallel = FALSE, num.cores = NULL, verbose=FALSE ){
   
   placebo.group <- vitdcurves.placebo
   treatment.group <- vitdcurves.treatment
@@ -19,6 +19,24 @@ power.calc <- function( n, ratio=1, N = 500, test.type, sig.level = 0.05,
   if( mc.error == 1 & parallel ) warning("Setting parallel equal to true will only impact scenarios where mc.error > 1.")
   
   if( verbose & parallel ) cat("Printing progress updates is not possible with parallel set to TRUE.")
+  
+  # put in a check here for sizes of n and print warning for clt approximation-- pass clt approx as a vector?
+  clt <- if( !is.null(clt) )
+  {
+    if( length(clt) > 1 & length(clt) < length(n) ) stop("If argument clt is a vector, it must have the same length as n.")
+    if( length(clt) == 1 )
+    {
+      if( clt==FALSE & any(n >= 35) ) message("Some n values seem large: setting clt to TRUE may give a faster approximation than bootstrapping for these values.")
+      if( clt==TRUE & any(n < 35) ) message("Some n values seem small: a clt approximation may not give ")
+      rep(clt,length(n))
+    }
+  }else{
+    # determine automatically
+    message("Power approximation (CLT or bootstrap) has been determined for each instance in n: these can be set using argument clt")
+    ap <- rep( TRUE, length(n) )
+    ap[ n < 35 ] <- FALSE
+    ap
+  }
   
   num.participants <- n
   num.sims <- N
@@ -44,7 +62,7 @@ power.calc <- function( n, ratio=1, N = 500, test.type, sig.level = 0.05,
   
   pow.sim <- array( dim=c( length(RR), mc.error, length(num.participants) ) )
   eff.size <- array( dim=c( length(RR), mc.error, length(num.participants) ) )
-
+  
   for( iter in 1:length(num.participants) )
   {
     ni <- num.participants[iter]
@@ -65,7 +83,7 @@ power.calc <- function( n, ratio=1, N = 500, test.type, sig.level = 0.05,
                                           placebo.group, treatment.group,
                                           baseline, rel.risk,
                                           rate, intensity.func, 
-                                          holding.time, lohi.vit, boot.rep )
+                                          holding.time, lohi.vit, boot.rep, clt[iter] )
         
         for( r in seq_along(powpara) ) pow.sim[ iteration, r, iter ] <- powpara[[ r ]]$power
         for( r in seq_along(powpara) ) eff.size[ iteration, r, iter ] <- powpara[[ r ]]$eff.size
@@ -79,7 +97,7 @@ power.calc <- function( n, ratio=1, N = 500, test.type, sig.level = 0.05,
                                    placebo.group, treatment.group,
                                    baseline, rel.risk,
                                    rate, intensity.func, 
-                                   holding.time, lohi.vit, boot.rep )
+                                   holding.time, lohi.vit, boot.rep, clt[iter] )
           pow.sim[ iteration, r, iter ] <- powpara$power
           eff.size[ iteration, r, iter ] <- powpara$eff.size
         }

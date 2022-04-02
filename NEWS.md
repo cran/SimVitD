@@ -1,3 +1,11 @@
+# SimVitD 1.0.2
+
+- Added functions from wBoot by Neil A Weiss into package due to archival
+- Due to wBoot incorporation dependency changed to simpleboot
+- Included CLT approximation to be used when larger samples
+- Determination of CLT/bootstrap is carried out automatically- clt argument to power.calc can be used to set
+- Change default number of bootstrap re-samples to 9999
+
 # SimVitD 1.0.1
 
 ## Minor changes

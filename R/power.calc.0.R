@@ -2,7 +2,7 @@ power.calc.0 <- function( idx, n, ratio, N, test.type, sig.level,
                           pl, tr,
                           baseline, rel.risk,
                           rate, intensity.func, 
-                          holding.time, lohi.vit, boot.rep ){
+                          holding.time, lohi.vit, boot.rep, clt ){
   
   num.sims <- N
   
@@ -34,7 +34,7 @@ power.calc.0 <- function( idx, n, ratio, N, test.type, sig.level,
     
     x.pl <- infection.count( placebo.levels, baseline, rel.risk, holding.time, lohi.vit=lohi.vit )$count
     
-    treat <- vitd.curve( n = n, type = tr$type, start = start, end = end, mu = tr$mu, amplitude = tr$amplitude,
+    treat <- vitd.curve( n = n.treat, type = tr$type, start = start, end = end, mu = tr$mu, amplitude = tr$amplitude,
                          dyn.dose.thresh = tr$dyn.dose.thresh, sd.mu = tr$sd.mu, sd.amplitude = tr$sd.amplitude,
                          sd.dyn.dose.thresh = tr$sd.dyn.dose.thresh, supp.dose = tr$supp.dose, supp.dose.rate = tr$supp.dose.rate,
                          weight = tr$weight, sd.weight = tr$sd.weight, min.thresh = tr$min.thresh, north.hemi = tr$north.hemi)
@@ -49,10 +49,17 @@ power.calc.0 <- function( idx, n, ratio, N, test.type, sig.level,
       x.tr <- as.integer( x.tr > 0)
     }
     
-    boot.test <- boot.two.bca( x.pl, x.tr, stacked=FALSE, mean, null.hyp=0, alternative="greater", R=boot.rep )
-    
-    p[dataset] <- boot.test$p.value
-    eff.size[dataset] <- mean(x.pl) - mean(x.tr)
+    if( clt )
+    {
+      efsz <- mean(x.pl) - mean(x.tr)
+      zobs <- efsz / sqrt( var(x.pl)/n  + var(x.tr)/n.treat )
+      p[dataset] <- 1 - pnorm(zobs)
+      eff.size[dataset] <- efsz
+    }else{
+      boot.test <- boot.two.bca.wBoot( x.pl, x.tr, stacked=FALSE, mean, null.hyp=0, alternative="greater", R=boot.rep )
+      p[dataset] <- boot.test$p.value
+      eff.size[dataset] <- mean(x.pl) - mean(x.tr)
+    }
   }
   
   power <- sum( p < sig.level ) / num.sims

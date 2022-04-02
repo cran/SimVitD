@@ -1,6 +1,7 @@
-02086d8330ca796384f9af46cebd7517 *DESCRIPTION
-c14a4a9846a9da31acd78605a4ecb9b7 *NAMESPACE
-c1a90b56e3def54fbc6a976dd826113f *NEWS.md
+d26a203edb5f0b31267a5e01d29dc09d *DESCRIPTION
+d9bae49f4aae500c3ead5d45b3e28161 *NAMESPACE
+fd51eee3f729543bfcf81eb0faf62cf6 *NEWS.md
+78f08fef5841f02ae4ce2964582cdf69 *R/boot.two.bca.wBoot.R
 f350cb192787191944c4b80f5f21fcae *R/exposure.levels.R
 d2cc8b9e3c70dc664ccfdad71b12c27a *R/infection.count.R
 eb8c4c5ba5c65fe24c16937f9c86d68c *R/infection.count.plot.R
@@ -8,8 +9,8 @@ eb8c4c5ba5c65fe24c16937f9c86d68c *R/infection.count.plot.R
 2ab135d681e6a0a7fb1fb628932c8df3 *R/plot.exposure.levels.R
 c7d7b5dcdbad576aba298ba4f86638eb *R/plot.power.calc.R
 2c2f2653623f37f52609e377ef8e44e8 *R/plot.vitd.curve.R
-4af547e42946daea1da0b1a4f5f2bc00 *R/power.calc.0.R
-ac951487254d04feaadd700afc028488 *R/power.calc.R
+64f0263b5c3e404648b26f0fd1453b5e *R/power.calc.0.R
+4b20c96fd2add4eaeff506c8b75684e5 *R/power.calc.R
 83ff25c43a1e2b6c4591e0e992b04b5c *R/print.exposure.levels.R
 d3b12abed2c87eced74f1b896bfa3fb3 *R/print.infection.count.R
 c939287c5786067686238347b0e94315 *R/print.power.calc.R
@@ -21,12 +22,11 @@ f3badd7e9677be3863578436229bb91b *R/summary.exposure.levels.R
 e4e7bce95cf54dbc94407c543c6cc0d3 *R/summary.infection.count.R
 42a90d607d5bfd676f37c629e11f60f6 *R/summary.power.calc.R
 dba8993fe76a1bb037ab7f9de14c3760 *R/summary.vitd.curve.R
-a72c543b4c585608b773d2659f141a50 *R/vitd.curve.2.function.R
 d0fbe95ad7dba027de5a206545a4685c *R/vitd.curve.R
 e9743b3f19f54f61facccb867da0922d *README.md
-90d84a3f7c1c17ea653e4e262ed1a1d0 *build/vignette.rds
+81b85b0206742143b04ad7c3e1ac817c *build/vignette.rds
 7583e52eb8b7799d9109d0283ee0d092 *inst/doc/SimVitD.Rnw
-9f0197de6c0dae873f674b2a023c1388 *inst/doc/SimVitD.pdf
+8ff24a4faeb95e3fefd733a8a740a014 *inst/doc/SimVitD.pdf
 dab9fbd1b2a52fa9b37ca42c9427e994 *man/SimVitD-package.Rd
 b5a2c9b929416eb3c1760018056d8f1d *man/exposure.levels.Rd
 5a1f498585a09e5d865b085fc9b96bd0 *man/infection.count.Rd
@@ -35,7 +35,7 @@ c9c4f68753a39de3e9eb2da12925dd21 *man/intensity.function.Rd
 ce4394f90720df8d562fe202d0907768 *man/plot.exposure.levels.Rd
 287a703c60457b2d2f4346c8f3bb15d3 *man/plot.power.calc.Rd
 ada6261690274a5363526c2d2346a5ad *man/plot.vitd.curve.Rd
-4d31f352524e9566d1b25d2499eae41d *man/power.calc.Rd
+ad22ab2e2752e5a2d722391c34969fab *man/power.calc.Rd
 03dae2a692e40cda725c1976511bde9e *man/print.exposure.levels.Rd
 4e8fbeeb7b8ad52cc3bf7ad51c64d714 *man/print.infection.count.Rd
 c784558e3d756ba7fa12cfdbe9667616 *man/print.power.calc.Rd
