@@ -7,9 +7,9 @@ rr.profile.plot <- function( x, expos, infect, idx = 1, ... )
   
   vitdcurves <- x
   
-  if( class(vitdcurves) != "vitd.curve" ) stop("Argument 'vitdcurves' not of class 'vitd.curve'")
-  if( class(expos) != "exposure.levels" ) stop("Argument 'expos' not of class 'exposure.levels'")
-  if( class(infect) != "infection.count") stop("Argument 'infect' not of class 'infection.count'")
+  if( !inherits( vitdcurves, "vitd.curve" ) ) stop("Argument 'vitdcurves' not of class 'vitd.curve'")
+  if( !inherits( expos, "exposure.levels" ) ) stop("Argument 'expos' not of class 'exposure.levels'")
+  if( !inherits( infect, "infection.count" ) ) stop("Argument 'infect' not of class 'infection.count'")
   if( length(idx) > 1 ) warning("Length of idx is greater than 1: only first element used")
   idx <- idx[1]
   

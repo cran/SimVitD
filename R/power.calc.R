@@ -15,7 +15,7 @@ power.calc <- function( n, ratio=1, N = 500, test.type, sig.level = 0.05,
   if( mc.error < 0 | mc.error != floor(mc.error) ) stop("Argument 'mc.error' must be a positive integer.")
   if( any( baseline*RR > 1 ) ) stop("Argument 'RR' scales 'baseline' to probabilities greater than 1.")
   if( !( test.type %in% c('proportions','count') )) stop("Argument 'test.type' must be one of 'proportions','count'.")
-  if( (!is.null(placebo.group) & class(placebo.group) != 'vitd.curve') | (!is.null(treatment.group) & class(treatment.group)!= 'vitd.curve' ) ) stop("Arguments 'vitdcurves.placebo' and 'vitdcurves.treatment' must be of class 'vitd.curve'.")
+  if( (!is.null(placebo.group) &  !inherits( placebo.group, "vitd.curve" ) ) | (!is.null(treatment.group) & !inherits( treatment.group, "vitd.curve" ) ) ) stop("Arguments 'vitdcurves.placebo' and 'vitdcurves.treatment' must be of class 'vitd.curve'.")
   if( mc.error == 1 & parallel ) warning("Setting parallel equal to true will only impact scenarios where mc.error > 1.")
   
   if( verbose & parallel ) cat("Printing progress updates is not possible with parallel set to TRUE.")

@@ -8,15 +8,6 @@ A suite of tools for statistical planning of vitamin D trials.
 
 \details{ 
 
-\tabular{ll}{
-Package: \tab SimVitD\cr
-Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2020-12-22\cr
-License: \tab GPL (>= 2)\cr
-LazyLoad: \tab yes\cr
-}
-
 The \code{SimVitD} package uses simulation to aid in statistical planning of vitamin D trials. The core elements of the simulation based tools involve 
   
   (i) simulation of an individual vitamin D staus profiles taking into account natural cyclic variation in summer and winter

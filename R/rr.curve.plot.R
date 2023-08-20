@@ -6,8 +6,8 @@ rr.curve.plot <- function( expos, infect, idx=1, main = NULL, xlab = "25-hydroxy
   x <- expos
   y <- infect
                           
-  if( class(x) != "exposure.levels" ) stop("Argument 'expos' not of class 'exposure.levels'")
-  if( class(y) != "infection.count" ) stop("Argument 'infect' not of class 'infection.count'")
+  if( !inherits( x, "exposure.levels" ) ) stop("Argument 'expos' not of class 'exposure.levels'")
+  if( !inherits( y, "infection.count" ) ) stop("Argument 'infect' not of class 'infection.count'")
   
   n <- nrow(x[[1]])
   

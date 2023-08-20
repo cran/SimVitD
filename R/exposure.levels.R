@@ -1,6 +1,6 @@
 exposure.levels <- function( x, rate, intensity.func = intensity.function(), start = 0, end = 1 )
 {
-  if( class(x) != "vitd.curve" )
+  if( !inherits(x, "vitd.curve") )
     stop("Argument 'x' is not of class 'vitd.curve'")
   
   n <- nrow(x[[2]][[1]]) # gives number of participants in the study

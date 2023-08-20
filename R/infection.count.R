@@ -4,7 +4,7 @@ infection.count <- function( expos, baseline = 0.03, RR = 3, holding.time = 2, l
   
   x <- expos
   
-  if( class(x) != "exposure.levels" ) stop("Argument 'expos' not of class 'exposure.levels'")
+  if( !inherits( x, "exposure.levels" ) ) stop("Argument 'expos' not of class 'exposure.levels'")
   
   if( RR < 1 ) stop( "RR must be > 1" )
   if( length(lohi.vit)  != 2 ) stop( "lohi.vit must be of form (low,high)" ) 

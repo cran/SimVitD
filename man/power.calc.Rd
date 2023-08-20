@@ -85,7 +85,7 @@ treatment <- vitd.curve( n = 10, type = "dynamic-dose" )
 # intensity function for exposures to infection
 intensfun <- intensity.function( summer.rate = 0, winter.rate = 1 )
   
-# calculate power: example only- run for much larger num.sims
+# calculate power: example only- run for much larger value of N
 pow <- power.calc( n = c(10,20,30), 
         N = 10,  test.type = 'count', 
         vitdcurves.placebo = placebo, vitdcurves.treatment = treatment,

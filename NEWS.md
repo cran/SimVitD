@@ -1,3 +1,8 @@
+# SimVitD 1.0.3
+
+- Cosmetic changes to some man files to resolve erroneous (clashing) version numbers
+- Some checks for objects of S3 types were made using string comparsions instead of inherits, these have been corrected
+
 # SimVitD 1.0.2
 
 - Added functions from wBoot by Neil A Weiss into package due to archival
